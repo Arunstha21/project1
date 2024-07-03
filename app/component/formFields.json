@@ -1,0 +1,167 @@
+{
+    "generalFields": [
+        {
+            "field": "input",
+            "tag": "fullName",
+            "title": "Full Name",
+            "type": "text",
+            "required": true
+        },
+        {
+            "field": "input",
+            "tag": "dateOfBirth",
+            "title": "Date of Birth",
+            "type": "date",
+            "required": true
+        },
+        {
+            "field": "input",
+            "tag": "address",
+            "title": "Address",
+            "type": "text",
+            "required": true
+        },
+        {
+            "field": "select",
+            "tag": "gender",
+            "title": "Gender",
+            "options": [
+                { "value": "Male", "title": "Male" },
+                { "value": "Female", "title": "Female" }
+            ],
+            "required": true
+        },
+        {
+            "field": "input",
+            "tag": "contactNo",
+            "title": "Contact No.",
+            "type": "tel",
+            "required": true
+        },
+        {
+            "field": "input",
+            "tag": "email",
+            "title": "Email",
+            "type": "email",
+            "required": true
+        },
+        {
+            "field": "input",
+            "tag": "photo",
+            "title": "Photo",
+            "type": "file",
+            "required": false
+        },
+        {
+            "field": "select",
+            "tag": "bloodGroup",
+            "title": "Blood Group",
+            "options": [
+                { "value": "A+", "title": "A+" },
+                { "value": "A-", "title": "A-" },
+                { "value": "B+", "title": "B+" },
+                { "value": "B-", "title": "B-" },
+                { "value": "AB+", "title": "AB+" },
+                { "value": "AB-", "title": "AB-" },
+                { "value": "O+", "title": "O+" },
+                { "value": "O-", "title": "O-" }
+            ],
+            "required": false
+        }
+    ],
+    "studentFields": [
+        {
+            "field": "input",
+            "tag": "studentId",
+            "title": "Student Id",
+            "type": "text",
+            "required": true
+        },
+        {
+            "field": "input",
+            "tag": "program",
+            "title": "Program",
+            "type": "text",
+            "required": true
+        },
+        {
+            "field": "input",
+            "tag": "enrolledYear",
+            "title": "Enrolled Year",
+            "type": "tel",
+            "required": true
+        }
+    ],
+    "staffFields": [
+        {
+            "field": "input",
+            "tag": "employeeId",
+            "title": "Employee Id",
+            "type": "text",
+            "required": true
+        },
+        {
+            "field": "input",
+            "tag": "department",
+            "title": "Department",
+            "type": "text",
+            "required": true
+        },
+        {
+            "field": "input",
+            "tag": "position",
+            "title": "Position",
+            "type": "text",
+            "required": true
+        }
+    ],
+    "validation" :{
+        "fullName": true,
+        "dateOfBirth": true,
+        "address": true,
+        "gender": true,
+        "contactNo": true,
+        "email": true,
+        "photo": false,
+        "type": true,
+        "bloodGroup": false,
+        "studentId": true,
+        "program": true,
+        "enrolledYear": true,
+        "employeeId": true,
+        "department": true,
+        "position": true
+    },
+    "userFields": [
+        {
+            "field": "input",
+            "tag": "userName",
+            "title": "User Name",
+            "type": "text",
+            "required": true
+        },
+        {
+            "field": "input",
+            "tag": "password",
+            "title": "Password",
+            "type": "password",
+            "required": true
+        },
+        {
+            "field": "select",
+            "tag": "role",
+            "title": "Role",
+            "options": [
+                { "value": "admin", "title": "Admin" },
+                { "value": "student", "title": "Student" },
+                { "value": "staff", "title": "Staff" }
+            ],
+            "required": true
+        }
+    ],
+    "userValidation" :{
+        "userName": true,
+        "password": true,
+        "role": true
+    }
+}
