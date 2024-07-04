@@ -1,7 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-const apiDomain = "http://localhost:3002";
 import FormFields from "@/app/component/FormFields";
 import formFields from "./formFields.json";
 import Validate from "@/app/component/Validation";
@@ -11,6 +10,7 @@ export default function AddUsers({isVisible, onClose}) {
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({});
   const [memberType, setMemberType] = useState("");
+  const [success, setSuccess] = useState("")
   const { generalFields, studentFields, staffFields } = formFields;
 
   function handleFieldChange(tag, title ,value=null) {
@@ -53,19 +53,20 @@ async function submit(event){
             return;
           }
         }
-
+        console.log(formData);
         try {
-          const response = fetch(`${apiDomain}/api/addMembers`,{
+          const response = await fetch(`/api/members`,{
             method: "POST",
             headers: {
               'Content-Type': 'application/json',
           },
           body: JSON.stringify(formData)
-          
           })
+          const res = await response.json();
           if(response.ok){
-            const res = await response.json();
-            console.log(res);
+            setSuccess(res.message);
+          }else if(response.status === 400){
+            setError(res.error)
           }
         } catch (error) {
           setError(error)
@@ -129,6 +130,7 @@ function handelClose (e){
                 </div>
               </div>
             </div>
+            {success && <p className="text-white text-sm mt-1">{success}</p>}
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           </div>
         </div>

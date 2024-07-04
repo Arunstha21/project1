@@ -79,9 +79,9 @@
         },
         {
             "field": "input",
-            "tag": "program",
-            "title": "Program",
-            "type": "text",
+            "tag": "grade",
+            "title": "Grade",
+            "type": "number",
             "required": true
         },
         {

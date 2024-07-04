@@ -19,9 +19,9 @@ export default function Student() {
     }, 6000);
   }
   const headersData = {
-    student: ["Student ID","Full Name", "Address", "Contact", "Date of Birth", "Email", "Gender", "Program", "Enrolled Year"],
+    student: ["Student ID","Full Name", "Address", "Contact", "Date of Birth", "Email", "Gender", "Grade", "Enrolled Year"],
     staff: ["Employee ID","Full Name", "Address", "Contact", "Date of Birth", "Email", "Gender", "Department", "Position"],
-    admin: ["ID","Full Name", "Address", "Contact", "Date of Birth", "Email", "Gender", "Program / Department", "Enrolled Year / Position"]
+    admin: ["ID","Full Name", "Address", "Contact", "Date of Birth", "Email", "Gender", "Grade / Department", "Enrolled Year / Position"]
   }
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -58,7 +58,7 @@ export default function Student() {
                 formatDate(item.dateOfBirth),
                 item.email,
                 item.gender,
-                item.studentInfo ? item.studentInfo.program : item.staffInfo.department,
+                item.studentInfo ? item.studentInfo.grade : item.staffInfo.department,
                 item.studentInfo ? item.studentInfo.yearEnrolled : item.staffInfo.position,
                 item.studentInfo ? "student" : "staff"
               ]);
