@@ -1,5 +1,5 @@
 'use client'
-import { GraduationCap, HandIcon, LayoutIcon, Settings, User } from "lucide-react";
+import { GraduationCap, HandIcon, LayoutIcon, ScanBarcode, Settings, User, User2Icon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -7,7 +7,8 @@ import { useEffect, useState } from "react";
 
 export default function SideNav() {
     const [user, setUser] = useState({});
-    const menuList = [
+    const [menuList, setMenuList] = useState([]);
+    const adminMenuList = [
         {
             id:1,
             name: 'Dashboard',
@@ -16,7 +17,7 @@ export default function SideNav() {
         },
         {
             id:2,
-            name: 'Student',
+            name: 'Members',
             icon: GraduationCap,
             path: '/dashboard/students'
         },
@@ -28,16 +29,61 @@ export default function SideNav() {
         },
         {
             id:4,
-            name: 'Settings',
-            icon: Settings,
-            path: '/dashboard/settings'
+            name: 'User',
+            icon: User2Icon,
+            path: '/dashboard/user'
+        },{
+            id:5,
+            name: 'Payment',
+            icon: ScanBarcode,
+            path: '/dashboard/payment'
+        },
+    ];
+    const staffMenuList = [
+        {
+            id:1,
+            name: 'Dashboard',
+            icon: LayoutIcon,
+            path: '/dashboard'
+        },
+        {
+            id:2,
+            name: 'Students',
+            icon: GraduationCap,
+            path: '/dashboard/students'
+        },
+        {
+            id:3,
+            name: 'Attendance',
+            icon: HandIcon,
+            path: '/dashboard/attendance'
         },
         {
             id:5,
-            name: 'User',
-            icon: Settings,
-            path: '/dashboard/user'
+            name: 'Payment',
+            icon: ScanBarcode,
+            path: '/dashboard/payment'
         },
+    ];
+    const studentMenuList = [
+        {
+            id:1,
+            name: 'Dashboard',
+            icon: LayoutIcon,
+            path: '/dashboard'
+        },
+        {
+            id:3,
+            name: 'Attendance',
+            icon: HandIcon,
+            path: '/dashboard/attendance'
+        },
+        {
+            id:5,
+            name: 'Payment',
+            icon: ScanBarcode,
+            path: '/dashboard/payment'
+        }
     ];
     const path = usePathname();
 
@@ -53,6 +99,14 @@ export default function SideNav() {
                 if (response.ok) {
                     const profileData = await response.json();
                     setUser(profileData);
+                    if(profileData.role === "student"){
+                        setMenuList(studentMenuList)
+                    }else if(profileData.role === "staff"){
+                        setMenuList(staffMenuList)
+                    }else {
+                        setMenuList(adminMenuList)
+                    }
+
                 } else {
                     console.error('Failed to fetch profile');
                 }

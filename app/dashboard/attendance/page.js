@@ -1,22 +1,19 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
-const apiDomain = "http://localhost:3002";
-import Table from "@/app/component/table";
-import { Edit, Trash } from "lucide-react";
-import AddUsers from "@/app/component/AddUsers";
+import AttendanceGrid from "../_component/AttendanceGrid";
 
 export default function Student() {
-  const router = useRouter();
+
   const [error, setError] = useState("");
-  const [headers, setHeaders] = useState([]);
-  const [tableData, setTableData] = useState([]);
-  const [defaultMonth, setDefaultMonth] = useState("");
+  const [gradeOptions, setGradeOptions] = useState();
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedGrade, setSelectedGrade] = useState();
+  const [attendanceList, setAttendanceList] = useState();
 
   useEffect(() => {
     const today = new Date();
     const month = today.toISOString().substring(0, 7);
-    setDefaultMonth(month);
+    setSelectedMonth(month);
   }, []);
 
   function clearError() {
@@ -24,93 +21,88 @@ export default function Student() {
       setError("");
     }, 6000);
   }
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-  };
 
   useEffect(() => {
     const fetchTableData = async () => {
       try {
-        const profile = await fetch("/api/users/profile", {
-          method: "POST",
+        const gradeReq = await fetch("/api/members/grade", {
+          method: "get",
           headers: {
             "Content-Type": "application/json",
           },
         });
-        if (profile.ok) {
-          const profileData = await profile.json();
-          const response = await fetch("/api/users", {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-          if (response.ok) {
-            const data = await response.json();
-            const users = data.map((item) => [
-              item.userName,
-              item.role,
-              item.status,
-            ]);
-            setHeaders(["User Name", "Role", "Status"]);
-            setTableData(users);
-          } else {
-            console.error("Failed to fetch members data");
-          }
+        if (gradeReq.ok) {
+          const gradeData = await gradeReq.json();
+          setGradeOptions(gradeData);
         } else {
-          console.error("Failed to fetch profile");
+          console.error("Failed to fetch grade");
         }
       } catch (error) {
-        console.error("Error fetching members data:", error);
+        console.error("Error fetching grade data:", error);
       }
     };
 
     fetchTableData();
   }, []);
-
-  const actionButtons = [
-    {
-      label: Edit,
-      color: "blue",
-      onClick: () => console.log("Edit clicked"),
-    },
-    {
-      label: Trash,
-      color: "red",
-      onClick: () => console.log("Remove clicked"),
-    },
-  ];
+  async function search(e) {
+    if(!selectedGrade){
+      setError("Please Select the Grade")
+      clearError();
+    }
+    try {
+      const response = await fetch(`/api/members/attendance?grade=${selectedGrade}&month=${selectedMonth}`, {
+        method: "get",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.ok) {
+        const gradeStudentData = await response.json();
+        setAttendanceList(gradeStudentData);
+      } else {
+        console.error("Failed to fetch student data");
+      }
+    } catch (error) {
+      console.error("Error fetching student data:", error);
+    }
+  }
 
   return (
     <Fragment>
       <div className="overflow-x-auto shadow-md sm:rounded-lg">
-        <div className="pb-4 flex justify-between items-center">
-          <div className="relative mt-10 m-2">
+        <div className="pb-4 flex gap-4 p-3 border rounded-lg shadow-md items-center">
+          <div className="flex gap-2">
             <input
               type="month"
-              value={defaultMonth}
-              onChange={e => {}}
+              value={selectedMonth}
+              onChange={e => {setSelectedMonth(e.target.value)}}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Select month and year"
             ></input>
           </div>
-          <div className="relative mt-10 m-2">
-            <select>
-                
+          <div>
+            <select onChange={e => {setSelectedGrade(e.target.value)}} className="border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-cyan-950 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-300 dark:focus:ring-blue-500 dark:focus:border-blue-500">
+            <option value="">Select Grade</option>
+            {gradeOptions && gradeOptions.length > 0 ? (
+          gradeOptions.map((option) => (
+            <option key={option._id} value={option._id}>
+              {`Grade ${option.grade}`}
+            </option>
+          ))
+        ) : (
+          <option value="">No grades available</option>
+        )}
             </select>
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           </div>
-        
+          <div>
+            <button onClick={search} className="bg-cyan-500 right-0 hover:bg-cyan-400 dark:hover:bg-cyan-600 text-white dark:bg-cyan-700 rounded-md px-4 mr-8 py-2">
+              Search
+            </button>
+          </div>
         </div>
-        <div className="lg:w-6/12  w-max flex items-center">
-          <Table
-            headers={headers}
-            data={tableData}
-            actionButtons={actionButtons}
-          />
+        <div className="mt-5 flex items-center">
+          <AttendanceGrid attendanceList={attendanceList} updateChecked={search} selectedMonth={selectedMonth}/>
         </div>
       </div>
     </Fragment>

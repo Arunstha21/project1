@@ -31,7 +31,6 @@ export const PUT = async (req, context) => {
       await connect();
         const membersData = await req.json();
         const member = await MemberInfo.findById(context.params.id);
-    
         if (!member) {
           return NextResponse.json({ error: "Member not found" }, {status: 404})
         }
@@ -48,9 +47,10 @@ export const PUT = async (req, context) => {
         if (membersData.type === "Student" && member.studentInfo) {
           const studentInfo = await StudentInfo.findById(member.studentInfo);
           studentInfo.studentId = membersData.studentId || studentInfo.studentId;
-          studentInfo.program = membersData.program || studentInfo.program;
+          studentInfo.grade = membersData.grade || studentInfo.grade;
           studentInfo.yearEnrolled = membersData.yearEnrolled || studentInfo.yearEnrolled;
-          await studentInfo.save();
+          const student= await studentInfo.save();
+          console.log(student);
         } else if (membersData.type === "Staff" && member.staffInfo) {
           const staffInfo = await StaffInfo.findById(member.staffInfo);
           staffInfo.employeeId = membersData.employeeId || staffInfo.employeeId;
@@ -58,11 +58,12 @@ export const PUT = async (req, context) => {
           staffInfo.position = membersData.position || staffInfo.position;
           await staffInfo.save();
         }
+
     
         const updatedMember = await member.save();
         await updatedMember.populate('studentInfo staffInfo');
 
-        return NextResponse.json(updatedMember, {status: 200})
+        return NextResponse.json({message: "Successfuly Updated the Data",updatedMember}, {status: 200})
       } catch (err) {
         return NextResponse.json({error: err.message}, {status: 500})
       }

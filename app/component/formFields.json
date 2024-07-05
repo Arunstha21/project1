@@ -78,15 +78,14 @@
             "required": true
         },
         {
-            "field": "input",
+            "field": "select",
             "tag": "grade",
             "title": "Grade",
-            "type": "number",
             "required": true
         },
         {
             "field": "input",
-            "tag": "enrolledYear",
+            "tag": "yearEnrolled",
             "title": "Enrolled Year",
             "type": "tel",
             "required": true
@@ -157,11 +156,58 @@
                 { "value": "staff", "title": "Staff" }
             ],
             "required": true
-        }
+        },{
+            "field": "select",
+            "tag": "status",
+            "title": "Status",
+            "options": [
+              { "value": "active", "title": "Active" },
+              { "value": "inactive", "title": "Inactive" }
+            ],
+            "required": true,
+            "editOnly": true
+          }
     ],
     "userValidation" :{
         "userName": true,
         "password": true,
         "role": true
-    }
+    },
+    "paymentFields": [
+        {
+            "field": "input",
+            "tag": "userName",
+            "title": "User Name",
+            "type": "text",
+            "required": true
+        },
+        {
+            "field": "input",
+            "tag": "password",
+            "title": "Password",
+            "type": "password",
+            "required": true
+        },
+        {
+            "field": "select",
+            "tag": "role",
+            "title": "Role",
+            "options": [
+                { "value": "admin", "title": "Admin" },
+                { "value": "student", "title": "Student" },
+                { "value": "staff", "title": "Staff" }
+            ],
+            "required": true
+        },{
+            "field": "select",
+            "tag": "status",
+            "title": "Status",
+            "options": [
+              { "value": "active", "title": "Active" },
+              { "value": "inactive", "title": "Inactive" }
+            ],
+            "required": true,
+            "editOnly": true
+          }
+    ]
 }
