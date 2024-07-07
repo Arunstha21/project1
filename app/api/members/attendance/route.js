@@ -22,10 +22,21 @@ export const GET = async (req, res) => {
         },
         options: { strictPopulate: false },
       });
-
       const responseData = members.map(member => {
         const attendances = attendanceRecords.filter(record => record.student.toString() === member.studentInfo._id.toString());
 
+        if (attendances.length === 0) {
+          return {
+            studentId: member.studentInfo._id,
+            studentName: member.fullName,
+            present: null,
+            day: null,
+            month: month,
+            grade: member.studentInfo.grade.grade,
+            attendanceId: null
+          };
+        }
+      
         const attendanceData = attendances.map(attendance => ({
           studentId: member.studentInfo._id,
           studentName: member.fullName,
@@ -38,6 +49,7 @@ export const GET = async (req, res) => {
       
         return attendanceData;
       }).flat();
+
 
     return NextResponse.json(responseData, { status: 200 });
   } catch (err) {

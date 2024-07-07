@@ -173,41 +173,20 @@
         "password": true,
         "role": true
     },
-    "paymentFields": [
+    "invoiceFields": [
         {
             "field": "input",
-            "tag": "userName",
-            "title": "User Name",
-            "type": "text",
+            "tag": "amount",
+            "title": "Amount",
+            "type": "number",
             "required": true
         },
         {
             "field": "input",
-            "tag": "password",
-            "title": "Password",
-            "type": "password",
+            "tag": "month",
+            "title": "Month",
+            "type": "month",
             "required": true
-        },
-        {
-            "field": "select",
-            "tag": "role",
-            "title": "Role",
-            "options": [
-                { "value": "admin", "title": "Admin" },
-                { "value": "student", "title": "Student" },
-                { "value": "staff", "title": "Staff" }
-            ],
-            "required": true
-        },{
-            "field": "select",
-            "tag": "status",
-            "title": "Status",
-            "options": [
-              { "value": "active", "title": "Active" },
-              { "value": "inactive", "title": "Inactive" }
-            ],
-            "required": true,
-            "editOnly": true
-          }
+        }
     ]
 }

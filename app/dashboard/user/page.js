@@ -19,19 +19,6 @@ export default function Users() {
 
   const fetchTableData = async () => {
     try {
-      const profile = await fetch("/api/users/profile", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!profile.ok) {
-        throw new Error("Failed to fetch profile");
-      }
-
-      const profileData = await profile.json();
-
       const response = await fetch("/api/users", {
         method: "GET",
         headers: {

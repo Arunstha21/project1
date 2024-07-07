@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from "react";
 import PaymentStudent from "./_component/student";
-import PaymentAdmin from "./_component/admin";
+import AdminPaymentPage from "./_component/admin";
 
 export default function Payment(){
     const [user, setUser] = useState();
@@ -33,7 +33,7 @@ export default function Payment(){
             {user?.role === "student" ? (
                 <PaymentStudent />
             ) : (
-                <PaymentAdmin />
+                <AdminPaymentPage />
             )}
         </div>
     );

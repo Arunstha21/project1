@@ -44,6 +44,7 @@ export default function Student() {
 
     fetchTableData();
   }, []);
+
   async function search(e) {
     if(!selectedGrade){
       setError("Please Select the Grade")
@@ -58,6 +59,7 @@ export default function Student() {
       });
       if (response.ok) {
         const gradeStudentData = await response.json();
+        console.log(gradeStudentData);
         setAttendanceList(gradeStudentData);
       } else {
         console.error("Failed to fetch student data");

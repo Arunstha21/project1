@@ -14,7 +14,7 @@ export default function Student() {
   const [deletingMemberId, setDeletingMemberId] = useState(null);
   const [memberDbData, setMemberDbData] = useState([]);
   const [memberDataForEdit, setMemberDataForEdit] = useState({});
-  
+
   const headersData = {
     student: [
       "Student ID",
