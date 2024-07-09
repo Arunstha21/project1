@@ -3,19 +3,19 @@ import { useEffect, useState } from "react";
 import FormFields from "@/app/component/FormFields";
 import formFields from "./formFields.json";
 
-function Validate(id, title, value="") {
+function Validate(id, title, value = "") {
   if (id === "userName") {
     const usernameRegex = /^[a-z0-9_.]{4,10}$/;
     if (!usernameRegex.test(value)) {
-      return (`Invalid ${title}, characters should be lowercase letters and underscores, with a length between 4 to 10.`);
+      return `Invalid ${title}, characters should be lowercase letters and underscores, with a length between 4 to 10.`;
     }
   } else if (id === "password") {
     const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[!@#$])[a-zA-Z0-9!@#$]{8,}$/;
     if (!passwordRegex.test(value)) {
-      return (`Invalid ${title}, password must be at least 8 characters long and contain at least one lowercase letter.`);
+      return `Invalid ${title}, password must be at least 8 characters long and contain at least one lowercase letter.`;
     }
   } else if (formFields.userValidation[id] && value === "") {
-    return (`${title} is required`);
+    return `${title} is required`;
   } else {
     return;
   }
@@ -70,7 +70,7 @@ export default function AddUsers({ isVisible, onClose, userDataForEdit, onAddOrE
       setError('');
       setSuccess('');
     }, 6000);
-  
+
     return () => clearTimeout(timer);
   }, [error, success]);
 
@@ -117,8 +117,8 @@ export default function AddUsers({ isVisible, onClose, userDataForEdit, onAddOrE
 
       const res = await response.json();
       if (response.ok) {
-        if(onAddOrEditUser){
-          onAddOrEditUser()
+        if (onAddOrEditUser) {
+          onAddOrEditUser();
         }
         setSuccess(res.message);
         setError("");
@@ -148,7 +148,7 @@ export default function AddUsers({ isVisible, onClose, userDataForEdit, onAddOrE
             </div>
             <div className="divide-y divide-gray-200">
               <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
-              {userFields.map((field, index) => {
+                {userFields.map((field, index) => {
                   if (!field.editOnly || userDataForEdit) {
                     return (
                       <FormFields
@@ -168,6 +168,18 @@ export default function AddUsers({ isVisible, onClose, userDataForEdit, onAddOrE
                   }
                   return null;
                 })}
+                {userDataForEdit && (
+                  <FormFields
+                    key="status"
+                    field="status"
+                    tag="status"
+                    title="Status"
+                    type="text"
+                    required={false}
+                    value={formData.status ? formData.status.value : ""}
+                    onChangeValue={(e) => handleFieldChange("status", "Status", e.target.value)}
+                  />
+                )}
                 <div className="relative">
                   <button id="submit" onClick={submit} className="bg-cyan-500 hover:bg-cyan-400 dark:hover:bg-cyan-600 text-white dark:bg-cyan-700 rounded-md px-2 py-1">
                     Submit

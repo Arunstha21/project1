@@ -3,12 +3,11 @@ import { Fragment, useEffect, useState } from "react";
 import AttendanceGrid from "../_component/AttendanceGrid";
 
 export default function Student() {
-
   const [error, setError] = useState("");
-  const [gradeOptions, setGradeOptions] = useState();
+  const [gradeOptions, setGradeOptions] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedGrade, setSelectedGrade] = useState();
-  const [attendanceList, setAttendanceList] = useState();
+  const [selectedGrade, setSelectedGrade] = useState("");
+  const [attendanceList, setAttendanceList] = useState([]);
 
   useEffect(() => {
     const today = new Date();
@@ -17,7 +16,7 @@ export default function Student() {
   }, []);
 
   function clearError() {
-    setInterval(() => {
+    setTimeout(() => {
       setError("");
     }, 6000);
   }
@@ -45,10 +44,11 @@ export default function Student() {
     fetchTableData();
   }, []);
 
-  async function search(e) {
-    if(!selectedGrade){
-      setError("Please Select the Grade")
+  async function search() {
+    if (!selectedGrade) {
+      setError("Please Select the Grade");
       clearError();
+      return;
     }
     try {
       const response = await fetch(`/api/members/attendance?grade=${selectedGrade}&month=${selectedMonth}`, {
@@ -77,23 +77,23 @@ export default function Student() {
             <input
               type="month"
               value={selectedMonth}
-              onChange={e => {setSelectedMonth(e.target.value)}}
+              onChange={(e) => setSelectedMonth(e.target.value)}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Select month and year"
             ></input>
           </div>
           <div>
-            <select onChange={e => {setSelectedGrade(e.target.value)}} className="border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-cyan-950 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-300 dark:focus:ring-blue-500 dark:focus:border-blue-500">
-            <option value="">Select Grade</option>
-            {gradeOptions && gradeOptions.length > 0 ? (
-          gradeOptions.map((option) => (
-            <option key={option._id} value={option._id}>
-              {`Grade ${option.grade}`}
-            </option>
-          ))
-        ) : (
-          <option value="">No grades available</option>
-        )}
+            <select onChange={(e) => setSelectedGrade(e.target.value)} className="border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-cyan-950 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-300 dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <option value="">Select Grade</option>
+              {gradeOptions.length > 0 ? (
+                gradeOptions.map((option) => (
+                  <option key={option._id} value={option._id}>
+                    {`Grade ${option.grade}`}
+                  </option>
+                ))
+              ) : (
+                <option value="">No grades available</option>
+              )}
             </select>
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           </div>
@@ -104,7 +104,7 @@ export default function Student() {
           </div>
         </div>
         <div className="mt-5 flex items-center">
-          <AttendanceGrid attendanceList={attendanceList} updateChecked={search} selectedMonth={selectedMonth}/>
+          <AttendanceGrid attendanceList={attendanceList} updateChecked={search} selectedMonth={selectedMonth} />
         </div>
       </div>
     </Fragment>

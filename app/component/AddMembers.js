@@ -12,74 +12,71 @@ export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAd
   const [formData, setFormData] = useState({});
   const [memberType, setMemberType] = useState("");
   const { generalFields, studentFields, staffFields } = formFields;
-  const [updatedStudentFields, setStudentFields] = useState(studentFields)
+  const [updatedStudentFields, setStudentFields] = useState(studentFields);
 
   useEffect(() => {
     const fetchStudentFields = async () => {
       try {
-          const response = await fetch('/api/members/grade', {
-            method: "GET"
-          });
-          const gradesData = await response.json();
+        const response = await fetch('/api/members/grade', {
+          method: "GET"
+        });
+        const gradesData = await response.json();
 
-          const updatedFields = studentFields.map(field => {
-              if (field.tag === 'grade') {
-                  const options = gradesData.map(grade => ({
-                      value: grade._id,
-                      title: `Grade ${grade.grade}`
-                  }));
-                  return { ...field, options };
-              }
-              return field;
-          });
+        const updatedFields = studentFields.map(field => {
+          if (field.tag === 'grade') {
+            const options = gradesData.map(grade => ({
+              value: grade._id,
+              title: `Grade ${grade.grade}`
+            }));
+            return { ...field, options };
+          }
+          return field;
+        });
 
-          setStudentFields(updatedFields);
+        setStudentFields(updatedFields);
       } catch (error) {
-          console.error('Error fetching grades:', error);
-          // Handle error fetching grades
+        console.error('Error fetching grades:', error);
+        // Handle error fetching grades
       }
     };
-    fetchStudentFields()
-    if (memberDataForEdit) {
 
-      const initialFormData = {};
-      const type = memberDataForEdit.studentInfo ? "Student" : "Staff";
-      const fieldsToIterate = [...generalFields, ...(type === "Student" ? updatedStudentFields : staffFields)];
+    fetchStudentFields();
 
-      for (const field of fieldsToIterate) {
-        let value = "";
-        if (type === "Student" && memberDataForEdit.studentInfo && field.tag in memberDataForEdit.studentInfo) {
-          value = memberDataForEdit.studentInfo[field.tag];
-        } else if (type === "Staff" && memberDataForEdit.staffInfo && field.tag in memberDataForEdit.staffInfo) {
-          value = memberDataForEdit.staffInfo[field.tag];
-        } else if (field.tag in memberDataForEdit) {
-          value = memberDataForEdit[field.tag];
-        }
-        if (field.tag === "dateOfBirth" && memberDataForEdit.dateOfBirth) {
-          const dateOfBirth = new Date(memberDataForEdit.dateOfBirth);
-          value = dateOfBirth.toISOString().split('T')[0];
-        }
+    const initialFormData = {};
+    const type = memberDataForEdit?.studentInfo ? "Staff" : "Student";
+    const fieldsToIterate = [...generalFields, ...(type === "Student" ? updatedStudentFields : staffFields)];
+
+    for (const field of fieldsToIterate) {
+      let value = "";
+      if (type === "Student" && memberDataForEdit?.studentInfo && field.tag in memberDataForEdit.studentInfo) {
+        value = memberDataForEdit.studentInfo[field.tag];
+      } else if (type === "Staff" && memberDataForEdit?.staffInfo && field.tag in memberDataForEdit.staffInfo) {
+        value = memberDataForEdit.staffInfo[field.tag];
+      } else if (memberDataForEdit && field.tag in memberDataForEdit) {
+        value = memberDataForEdit[field.tag];
+      }
+      if (field.tag === "dateOfBirth" && memberDataForEdit?.dateOfBirth) {
+        const dateOfBirth = new Date(memberDataForEdit.dateOfBirth);
+        value = dateOfBirth.toISOString().split('T')[0];
+      }
       
-        initialFormData[field.tag] = {
-          value: value,
-          title: field.title,
-        };
-      }
-      setFormData(initialFormData);
-      setMemberType(type);
-    } else {
-      const initialFormData = {};
-      for (const field of generalFields) {
-        initialFormData[field.tag] = {
-          value: "",
-          title: field.title,
-        };
-      }
-      setFormData(initialFormData);
-      setMemberType("");
+      initialFormData[field.tag] = {
+        value: value,
+        title: field.title,
+      };
     }
 
-  }, [isVisible, memberDataForEdit]);
+    if (memberDataForEdit) {
+      // Include the status field only in edit mode
+      initialFormData.status = {
+        value: memberDataForEdit.status || "",
+        title: "Status",
+      };
+    }
+
+    setFormData(initialFormData);
+    setMemberType(type);
+  }, [isVisible, memberDataForEdit, generalFields, studentFields, staffFields]);
 
   function handleFieldChange(tag, title, value = null) {
     setFormData((prevFormData) => ({
@@ -110,6 +107,11 @@ export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAd
       updatedFormData[tag] = { value: formData[tag]?.value || "", title: title };
     });
 
+    if (memberDataForEdit) {
+      // Include the status field only in edit mode
+      updatedFormData.status = { value: formData.status?.value || "", title: "Status" };
+    }
+
     for (const field in updatedFormData) {
       const fieldValue = updatedFormData[field].value;
       const validationError = Validate(field, updatedFormData[field].title, fieldValue);
@@ -137,14 +139,14 @@ export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAd
           Object.keys(updatedFormData).reduce((acc, key) => {
             acc[key] = updatedFormData[key].value;
             return acc;
-          }, {type: memberType})
+          }, { type: memberType })
         ),
       });
 
       const res = await response.json();
       if (response.ok) {
-        if(onAddOrEditMember){
-          onAddOrEditMember()
+        if (onAddOrEditMember) {
+          onAddOrEditMember();
         }
         setSuccess(res.message);
         setError("");
@@ -207,6 +209,18 @@ export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAd
                     onChangeValue={(e) => handleFieldChange(field.tag, field.title, e.target.value)}
                   />
                 ))}
+                {memberDataForEdit && (
+                  <FormFields
+                    key="status"
+                    field="status"
+                    tag="status"
+                    title="Status"
+                    type="text"
+                    required={false}
+                    value={formData.status ? formData.status.value : ""}
+                    onChangeValue={(e) => handleFieldChange("status", "Status", e.target.value)}
+                  />
+                )}
                 <div className="relative">
                   <button
                     id="submit"
@@ -223,10 +237,10 @@ export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAd
                     Close
                   </button>
                 </div>
+                {error && <p className="text-red-500">{error}</p>}
+                {success && <p className="text-green-500">{success}</p>}
               </div>
             </div>
-            {success && <p className="text-white text-sm mt-1">{success}</p>}
-            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           </div>
         </div>
       </div>
