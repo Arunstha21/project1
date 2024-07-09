@@ -3,6 +3,7 @@ import { Fragment, useEffect, useState } from "react";
 import Table from "@/app/component/table";
 import AddMembers from "@/app/component/AddMembers";
 import { Edit, Trash } from "lucide-react";
+import { Card, CardContent } from "../payment/_component/card";
 
 export default function Student() {
   const [error, setError] = useState("");
@@ -201,29 +202,12 @@ export default function Student() {
 
   return (
       <Fragment>
-      <div className="overflow-x-auto shadow-md sm:rounded-lg">
+          <div className="overflow-x-auto shadow-md sm:rounded-lg">
         <div className="pb-4 flex justify-between items-center">
           <label htmlFor="table-search" className="sr-only">
             Search
           </label>
-          <div className="relative mt-10 m-2">
-            <div className="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
-              <svg
-                className="w-4 h-4 text-gray-500 dark:text-white"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                />
-              </svg>
-            </div>
+          <div className=" mt-10 m-2">
             <input
               type="text"
               id="table-search"
@@ -231,7 +215,7 @@ export default function Student() {
               placeholder="Search for items"
             />
           </div>
-          <div className="relative left-0">
+          <div className=" left-0">
             <button onClick={()=>{setIsAddMembersPopupOpen(true)}} className="bg-cyan-500 right-0 hover:bg-cyan-400 dark:hover:bg-cyan-600 text-white dark:bg-cyan-700 rounded-md px-4 mt-8 mr-8 py-2">
               Add new
             </button>
@@ -240,6 +224,7 @@ export default function Student() {
         </div>
 
     <div>
+      
       {deleteConfirmation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-8 rounded-lg dark:bg-cyan-950 shadow-lg text-center ">

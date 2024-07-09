@@ -15,11 +15,12 @@ export default function InvoiceComponent({ action, studentId, allStudents }) {
   const [invoiceFormData, setInvoiceFormData] = useState({});
   const [invoiceTableData, setInvoiceTableData] = useState();
   const paymentData = allStudents.find((payment) => payment._id === studentId)
+  const paidAmount = paymentData?.esewaPayment?.amount || 0
   const [makePaymentAmount, setMakePaymentAmount] = useState(
-    paymentData.amount
+    paymentData.amount - paidAmount
   );
   const [makePaymentButton, setMakePaymentButton] = useState("Make Payment")
-  
+
   async function getInvoiceRecords() {
     try {
       const response = await fetch("/api/payment/feesRecord", {
@@ -46,51 +47,6 @@ export default function InvoiceComponent({ action, studentId, allStudents }) {
     }));
   };
 
-  const submit = async (event) => {
-    event.preventDefault();
-
-    let updatedFormData = {};
-    invoiceFields.forEach((field) => {
-      const tag = field.tag;
-      const title = field.title;
-      updatedFormData[tag] = {
-        value: invoiceFormData[tag]?.value || "",
-        title: title,
-      };
-    });
-    console.log(updatedFormData);
-    const studentData = allStudents.find(
-      (student) => student._id === studentId
-    );
-
-    try {
-      const response = await fetch("/api/payment/feesRecord", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(
-          Object.keys(updatedFormData).reduce(
-            (acc, key) => {
-              acc[key] = updatedFormData[key].value;
-              return acc;
-            },
-            { student: studentId, grade: studentData.studentInfo.grade._id }
-          )
-        ),
-      });
-
-      const res = await response.json();
-      if (response.ok) {
-        setSuccess(res.message);
-        setError("");
-      } else {
-        setError(res.error || "An error occurred");
-      }
-    } catch (error) {
-      setError(error.message || "Failed to submit data.");
-    }
-  };
 
   useEffect(() => {
     if (action === Landmark) {
@@ -99,6 +55,53 @@ export default function InvoiceComponent({ action, studentId, allStudents }) {
   }, [action]);
 
   if (action === ReceiptText) {
+    const submit = async (event) => {
+        event.preventDefault();
+        
+        const uuid = uid(16);
+        let updatedFormData = {};
+        invoiceFields.forEach((field) => {
+          const tag = field.tag;
+          const title = field.title;
+          updatedFormData[tag] = {
+            value: invoiceFormData[tag]?.value || "",
+            title: title,
+          };
+        });
+        console.log(updatedFormData);
+        const studentData = allStudents.find(
+          (student) => student._id === studentId
+        );
+    
+        try {
+          const response = await fetch("/api/payment/feesRecord", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(
+              Object.keys(updatedFormData).reduce(
+                (acc, key) => {
+                  acc[key] = updatedFormData[key].value;
+                  return acc;
+                },
+                { student: studentId, grade: studentData.studentInfo.grade._id,transactionUuid: uuid  }
+              )
+            ),
+          });
+    
+          const res = await response.json();
+          if (response.ok) {
+            setSuccess(res.message);
+            setError("");
+          } else {
+            setError(res.error || "An error occurred");
+          }
+        } catch (error) {
+          setError(error.message || "Failed to submit data.");
+        }
+      };
+
     return (
       <Card>
         <CardHeader>
@@ -170,7 +173,11 @@ export default function InvoiceComponent({ action, studentId, allStudents }) {
   } else if (action === "Make Payment") {
     const submit = async () => {
         try {
-          const uuid = uid(16);
+            if (makePaymentAmount > paymentData.amount) {
+                setError("Inserted Amount is greater then Invoice Amount !!")
+                return;
+            }
+          const uuid = paymentData.transactionUuid;
           const esewaHash = await GetEsewaPaymentHash(makePaymentAmount, uuid);
     
           const form = document.createElement('form');

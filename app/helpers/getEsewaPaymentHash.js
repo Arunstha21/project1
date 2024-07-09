@@ -5,7 +5,7 @@ const ESEWA_SECRET_KEY = "8gBm/:&EnhH.1/q";
 const ESEWA_GATEWAY_URL = "https://rc-epay.esewa.com.np";
 const ESEWA_PRODUCT_CODE = "EPAYTEST";
 
-export async function GetEsewaPaymentHash( amount, transaction_uuid) {
+export async function GetEsewaPaymentHash( amount, transaction_uuid, feesRecordId) {
   try {
     const data = `total_amount=${amount},transaction_uuid=${transaction_uuid},product_code=${ESEWA_PRODUCT_CODE}`;
     const secretKey = ESEWA_SECRET_KEY;

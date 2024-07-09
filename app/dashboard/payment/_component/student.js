@@ -6,11 +6,10 @@ import {
   CardContent,
 } from "./card";
 import Table from "@/app/component/table";
-import { Landmark, ReceiptText } from "lucide-react";
 
 export default function StudentPaymentPage() {
   const [students, setStudents] = useState();
-  const [allStudents, setAllStudents] = useState();
+  const [allStudents, setAllStudents] = useState(); 
 
 
   useEffect(() => {
@@ -30,55 +29,46 @@ export default function StudentPaymentPage() {
     
           const profileData = await profile.json();
 
-        const members = await fetch("/api/members", {
-          method: "get",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const payment = await fetch("/api/payment/feesRecord", {
+        const payment = await fetch(`/api/payment/feesRecord/${profileData.memberId}`, {
           method:'GET'
         })
 
-        if (members.ok) {
-            const membersData = await members.json();
+        if (payment.ok) {
             const paymentData = await payment.json();
             
-            const member = membersData.find((member) => member.studentInfo?.loginInfo && member.studentInfo.loginInfo === profileData.id);
-            if (member) {
-              const memberPayments = paymentData.filter((payment) => payment.student._id === member._id);
+            const memberPayments = paymentData.filter((payment) => payment.student._id === profileData.memberId);
               let studentTotalPending = 0;
               let studentTotalPaidAmount = 0;
               const studentData = [];
             
               memberPayments.forEach((payment, index) => {
                 let paidAmount = 0;
+                let status = 'Pending'
                 if (payment.esewaPayment) {
-                  paidAmount = payment.esewaPayment.paidAmount;
-                  studentTotalPaidAmount += payment.esewaPayment.paidAmount;
+                  paidAmount = payment.esewaPayment.amount;
+                  studentTotalPaidAmount += payment.esewaPayment.amount;
                 } else {
                   studentTotalPending += payment.amount;
                 }
+
+                status = (payment.amount == paidAmount) ? "Paid" : (paidAmount > 0 && payment.amount > paidAmount) ? "Partial Paid" : status;
             
                 studentData.push({
+                  isPaid : status === "Paid" ? true : false,
                   id: payment._id,
                   data: [
                     index + 1,
-                    member.fullName,
-                    member.studentInfo.grade.grade,
+                    payment.student.fullName,
+                    payment.grade.grade,
                     `NPR ${payment.amount}`,
-                    `NPR ${paidAmount}`
+                    `NPR ${paidAmount}`,
+                    status
                   ]
                 });
               });
 
               setAllStudents(memberPayments);
               setStudents(studentData);
-            } else {
-              console.error("No member found with the given profile ID");
-            }
-            
-
         } else {
           console.error("Failed to fetch members");
         }
@@ -89,7 +79,7 @@ export default function StudentPaymentPage() {
 
     fetchTableData();
   }, []);
-  const headers = ["SN", "Student Name", "Grade", "Pending Amount", "Paid Amount"];
+  const headers = ["SN", "Student Name", "Grade", "Pending Amount", "Paid Amount", "status"];
 
   const actionButtons = [
     {

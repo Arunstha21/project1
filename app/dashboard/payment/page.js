@@ -4,7 +4,7 @@ import PaymentStudent from "./_component/student";
 import AdminPaymentPage from "./_component/admin";
 
 export default function Payment(){
-    const [user, setUser] = useState();
+    const [componentShow, setComponentShow] = useState();
     useEffect(() => {
         const fetchProfile = async () => {
             try {
@@ -16,7 +16,11 @@ export default function Payment(){
                 });
                 if (response.ok) {
                     const profileData = await response.json();
-                    setUser(profileData);
+                    setComponentShow(profileData?.role === "student" ? (
+                        <PaymentStudent />
+                    ) : (
+                        <AdminPaymentPage />
+                    ))
                 } else {
                     console.error('Failed to fetch profile');
                 }
@@ -30,11 +34,7 @@ export default function Payment(){
 
     return (
         <div>
-            {user?.role === "student" ? (
-                <PaymentStudent />
-            ) : (
-                <AdminPaymentPage />
-            )}
+            {componentShow}
         </div>
     );
 }

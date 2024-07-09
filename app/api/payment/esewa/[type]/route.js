@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import connect from '@/lib/db';
 import { VerifyEsewaPayment } from '@/app/helpers/getEsewaPaymentHash';
-const { EsewaPaymentInfo } = require('@/lib/modals/user');
+const { EsewaPaymentInfo, FeesRecordInfo } = require('@/lib/modals/user');
+import { uid } from 'uid';
 
 export const GET = async (req, context) => {
     try {
@@ -12,16 +13,30 @@ export const GET = async (req, context) => {
 
         if (type === "success") {
             const verify = await VerifyEsewaPayment(data);
-            const esewaPaymentRecord = new EsewaPaymentInfo({
-                amount: verify.total_amount,
-                date: new Date(),
-                status: "complete",
-                student: "",
-                transactionCode: verify.transaction_code,
-                transactionUuid: verify.transaction_uuid,
-            })
 
-            return NextResponse.json(verify, {status: 200})
+            const feesRecord = await FeesRecordInfo.findOne({transactionUuid: verify.decodedData.transaction_uuid});
+            if (!feesRecord) {
+                return NextResponse.json({message: "Fees Record Didn't found"}, {status: 400});
+            }
+
+            let uuid = (feesRecord.amount > verify.decodedData.total_amount) ? uid(16) : feesRecord.transactionUuid;
+            
+            const esewaPaymentRecord = new EsewaPaymentInfo({
+                amount: verify.decodedData.total_amount,
+                date: new Date(),
+                status: "completed",
+                student: feesRecord.student,
+                transactionCode: verify.decodedData.transaction_code,
+                feesRecord : feesRecord._id
+            });
+            
+            feesRecord.esewaPayment = esewaPaymentRecord._id;
+            feesRecord.transactionUuid = uuid;
+
+            await feesRecord.save();
+            await esewaPaymentRecord.save();
+            
+            return NextResponse.redirect(new URL('/dashboard/payment', req.url));
         }else if(type === "fail"){
 
         }else{

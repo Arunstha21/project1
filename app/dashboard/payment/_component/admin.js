@@ -2,13 +2,11 @@ import React, { useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
-  CardFooter,
   CardTitle,
-  CardDescription,
   CardContent,
 } from "./card";
 import Table from "@/app/component/table";
-import { Landmark, ReceiptText } from "lucide-react";
+import { Landmark, Pause, ReceiptText } from "lucide-react";
 
 
 export default function AdminPaymentPage() {
@@ -34,27 +32,28 @@ export default function AdminPaymentPage() {
         if (members.ok) {
           const membersData = await members.json();
           const paymentData = await payment.json();
-          
+          console.log(paymentData);
           let totalPending = 0;
           let totalPaidAmount = 0;
           const allStudents = membersData.filter((member) => member.studentInfo);
           const studentData = allStudents.map((member, index) => {
             const memberPayments = paymentData.filter((payment) => payment.student._id === member._id);
-
+          
             let studentTotalPending = 0;
             let studentTotalPaidAmount = 0;
-
+          
             memberPayments.forEach((payment) => {
-              if (payment.esewaPayment) {
-                studentTotalPaidAmount += payment.esewaPayment.paidAmount;
-              } else {
-                studentTotalPending += payment.amount;
+              if (payment.esewaPayments && payment.esewaPayments.length > 0) {
+                payment.esewaPayments.forEach((esewaPayment) => {
+                  studentTotalPaidAmount += esewaPayment.amount;
+                });
               }
+              studentTotalPending += payment.amount;
             });
-
+          
             totalPending += studentTotalPending;
             totalPaidAmount += studentTotalPaidAmount;
-
+          
             return {
               id: member._id,
               data: [
@@ -68,6 +67,7 @@ export default function AdminPaymentPage() {
               ]
             };
           });
+          
           setAllStudents(allStudents);
           setStudents(studentData);
           setTotalPendingAmount(totalPending);

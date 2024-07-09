@@ -12,12 +12,12 @@ const checkToken = async (req) => {
     }
 };
 
-
 export async function middleware(request) {
     const path = request.nextUrl.pathname;
     if (path === '/api/users/login') {
         return NextResponse.next();
     }
+
     const isPublicPath = path === '/';
     const tokenCheck = await checkToken(request);
 
@@ -28,14 +28,53 @@ export async function middleware(request) {
     }
 
     const token = tokenCheck.valid;
+    const userRole = tokenCheck.payload?.role;
 
+    // Redirect authenticated users from public path to dashboard
     if (isPublicPath && token) {
         return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
+    // Redirect unauthenticated users from protected paths to login
     if (!isPublicPath && !token) {
         return NextResponse.redirect(new URL('/', request.url));
     }
+
+    // Role-based access control
+    const staffRestrictedPaths = [
+        '/api/users/[id]',
+        '/api/users/addUsers',
+        '/api/users',
+        '/dashboard/user'
+    ];
+
+    const studentRestrictedPaths = [
+        ...staffRestrictedPaths,
+        '/api/members',
+        '/api/members/grade',
+        '/api/members/attendance',
+        '/api/members/[id]',
+        '/api/feesRecord',
+        '/dashboard/student',
+        '/dashboard/attendance'
+    ];
+
+    if (userRole === 'admin') {
+        return NextResponse.next();
+    }
+
+    if (userRole === 'staff') {
+        if (staffRestrictedPaths.includes(path)) {
+            return NextResponse.redirect(new URL('/unauthorized', request.url));
+        }
+    }
+
+    if (userRole === 'student') {
+        if (studentRestrictedPaths.includes(path)) {
+            return NextResponse.redirect(new URL('/unauthorized', request.url));
+        }
+    }
+
     return NextResponse.next();
 }
 
