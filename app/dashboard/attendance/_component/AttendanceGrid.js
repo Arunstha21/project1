@@ -10,12 +10,12 @@ export default function AttendanceGrid({ attendanceList, selectedMonth, updateCh
   const [year, month] = selectedMonth.split("-").map(Number);
   const numberOfDays = daysInMonth(year, month - 1);
   const daysArray = Array.from({ length: numberOfDays }, (_, i) => i + 1);
-
-  useEffect(() => {
+  useEffect(()=>{
     const newHeaders = ["Number", "Student Name", ...daysArray.map((date) => date.toString())];
     setHeaders(newHeaders);
+  },[selectedMonth])
 
-    // Get unique user records and create row data
+  useEffect(() => {
     const userList = getUniqueRecords();
     const tableData = userList.map((user, index) => {
       const userAttendance = daysArray.reduce((acc, date) => {
@@ -36,7 +36,7 @@ export default function AttendanceGrid({ attendanceList, selectedMonth, updateCh
     });
 
     setRowData(tableData);
-  }, [attendanceList, daysArray]);
+  }, [attendanceList]);
 
   const handleCheckboxChange = async (studentId, day, presentStatus, attendanceId) => {
     if (presentStatus) {

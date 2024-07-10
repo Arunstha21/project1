@@ -45,7 +45,7 @@ export default function StudentPaymentPage() {
                 let paidAmount = 0;
                 let status = 'Pending'
                 if (payment.esewaPayment) {
-                  paidAmount = payment.esewaPayment.amount;
+                  paidAmount = payment.esewaPayments.reduce((total, payment) => total + payment.amount, 0);
                   studentTotalPaidAmount += payment.esewaPayment.amount;
                 } else {
                   studentTotalPending += payment.amount;

@@ -102,7 +102,7 @@ export default function Table({ headers, data, actionButtons, payment }) {
                             button.onClick(row.id);
                           }
                         }}
-                        disabled={row.isPaid ? row.isPaid : false }
+                        disabled={row.isPaid ? row.isPaid : false}
                         className={`font-medium text-${
                           button.color
                         }-600 dark:text-${button.color}-500 ${button.extraClass} hover:underline mx-3`}

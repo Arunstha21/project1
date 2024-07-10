@@ -29,34 +29,25 @@ export default function AddUsers({ isVisible, onClose, userDataForEdit, onAddOrE
   const { userFields } = formFields;
 
   useEffect(() => {
+    const initialFormData = {};
+    userFields.forEach((field) => {
+      let value = "";
+      if (userDataForEdit && field.tag in userDataForEdit) {
+        value = userDataForEdit[field.tag];
+      }
+      initialFormData[field.tag] = {
+        value: value,
+        title: field.title,
+      };
+    });
     if (userDataForEdit) {
-      const initialFormData = {};
-      userFields.forEach((field) => {
-        let value = "";
-        if (field.tag in userDataForEdit) {
-          value = userDataForEdit[field.tag];
-        }
-        initialFormData[field.tag] = {
-          value: value,
-          title: field.title,
-        };
-      });
       initialFormData.status = {
         value: userDataForEdit.status || "",
         title: "Status",
       };
-      setFormData(initialFormData);
-    } else {
-      const initialFormData = {};
-      userFields.forEach((field) => {
-        initialFormData[field.tag] = {
-          value: "",
-          title: field.title,
-        };
-      });
-      setFormData(initialFormData);
     }
-  }, [isVisible, userDataForEdit]);
+    setFormData(initialFormData);
+  }, [isVisible, userDataForEdit, userFields]);
 
   function handleFieldChange(tag, title, value = null) {
     setFormData((prevFormData) => ({
@@ -70,7 +61,7 @@ export default function AddUsers({ isVisible, onClose, userDataForEdit, onAddOrE
       setError('');
       setSuccess('');
     }, 6000);
-
+  
     return () => clearTimeout(timer);
   }, [error, success]);
 
@@ -117,8 +108,8 @@ export default function AddUsers({ isVisible, onClose, userDataForEdit, onAddOrE
 
       const res = await response.json();
       if (response.ok) {
-        if (onAddOrEditUser) {
-          onAddOrEditUser();
+        if(onAddOrEditUser){
+          onAddOrEditUser()
         }
         setSuccess(res.message);
         setError("");

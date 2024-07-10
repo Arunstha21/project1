@@ -15,11 +15,12 @@ export default function InvoiceComponent({ action, studentId, allStudents }) {
   const [invoiceFormData, setInvoiceFormData] = useState({});
   const [invoiceTableData, setInvoiceTableData] = useState();
   const paymentData = allStudents.find((payment) => payment._id === studentId)
-  const paidAmount = paymentData?.esewaPayment?.amount || 0
+  const paidAmount = paymentData?.esewaPayments?.reduce((total, payment) => total + payment.amount, 0) || 0
   const [makePaymentAmount, setMakePaymentAmount] = useState(
     paymentData.amount - paidAmount
   );
   const [makePaymentButton, setMakePaymentButton] = useState("Make Payment")
+  const [invoiceOf, setInvoiceOf] = useState();
 
   async function getInvoiceRecords() {
     try {
@@ -29,10 +30,28 @@ export default function InvoiceComponent({ action, studentId, allStudents }) {
       if (response.ok) {
         const data = await response.json();
         const filteredData = data.filter((d) => d.student._id === studentId);
-        const tableData = filteredData.map((item, index) => ({
-          id: item._id,
-          data: [index + 1, item.month, item.amount],
-        }));
+        const nameOnInvoice = filteredData[0]?.student?.fullName;
+        setInvoiceOf(nameOnInvoice ? 'of '+ nameOnInvoice : '');
+        const tableData = filteredData.map((item, index) => {
+            let status = "Unpaid";
+            let paid = item.esewaPayments.reduce((total, payment) => total + payment.amount, 0);
+            if (item.amount === paid) {
+                status = "Paid";
+              } else if (paid > 0 && item.amount > paid) {
+                status = "Partial Paid";
+              }
+            
+            return {
+              id: item._id,
+              data: [
+                index + 1,
+                item.month,
+                item.amount,
+                paid,
+                status
+              ],
+            };
+          });
         setInvoiceTableData(tableData);
       }
     } catch (error) {
@@ -68,7 +87,6 @@ export default function InvoiceComponent({ action, studentId, allStudents }) {
             title: title,
           };
         });
-        console.log(updatedFormData);
         const studentData = allStudents.find(
           (student) => student._id === studentId
         );
@@ -137,7 +155,7 @@ export default function InvoiceComponent({ action, studentId, allStudents }) {
       </Card>
     );
   } else if (action === Landmark) {
-    const headers = ["SN", "Month", "Amount", "Status", "Paid Amount"];
+    const headers = ["SN", "Month", "Amount", "Paid Amount", "Status"];
     const actionButtons = [
       {
         label: Edit,
@@ -158,7 +176,7 @@ export default function InvoiceComponent({ action, studentId, allStudents }) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Invoice Records</CardTitle>
+          <CardTitle>Invoice Records {invoiceOf}</CardTitle>
         </CardHeader>
         <CardContent className="font-bold">
           <Table

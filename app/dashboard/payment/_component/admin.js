@@ -17,72 +17,73 @@ export default function AdminPaymentPage() {
 
 
   useEffect(() => {
-    const fetchTableData = async () => {
-      try {
-        const members = await fetch("/api/members", {
-          method: "get",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const payment = await fetch("/api/payment/feesRecord", {
-          method:'GET'
-        })
-
-        if (members.ok) {
-          const membersData = await members.json();
-          const paymentData = await payment.json();
-          console.log(paymentData);
-          let totalPending = 0;
-          let totalPaidAmount = 0;
-          const allStudents = membersData.filter((member) => member.studentInfo);
-          const studentData = allStudents.map((member, index) => {
-            const memberPayments = paymentData.filter((payment) => payment.student._id === member._id);
-          
-            let studentTotalPending = 0;
-            let studentTotalPaidAmount = 0;
-          
-            memberPayments.forEach((payment) => {
-              if (payment.esewaPayments && payment.esewaPayments.length > 0) {
-                payment.esewaPayments.forEach((esewaPayment) => {
-                  studentTotalPaidAmount += esewaPayment.amount;
-                });
-              }
-              studentTotalPending += payment.amount;
-            });
-          
-            totalPending += studentTotalPending;
-            totalPaidAmount += studentTotalPaidAmount;
-          
-            return {
-              id: member._id,
-              data: [
-                index + 1,
-                member.fullName,
-                member.studentInfo.grade.grade,
-                member.email,
-                member.contactNo,
-                `NPR ${studentTotalPending - studentTotalPaidAmount}`,
-                `NPR ${studentTotalPaidAmount}`
-              ]
-            };
-          });
-          
-          setAllStudents(allStudents);
-          setStudents(studentData);
-          setTotalPendingAmount(totalPending);
-          setTotalPaidAmount(totalPaidAmount);
-
-        } else {
-          console.error("Failed to fetch members");
-        }
-      } catch (error) {
-        console.error("Error fetching members data:", error);
-      }
-    };
-
     fetchTableData();
   }, []);
+  
+  const fetchTableData = async () => {
+    try {
+      const members = await fetch("/api/members", {
+        method: "get",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const payment = await fetch("/api/payment/feesRecord", {
+        method:'GET'
+      })
+
+      if (members.ok) {
+        const membersData = await members.json();
+        const paymentData = await payment.json();
+        console.log(paymentData);
+        let totalPending = 0;
+        let totalPaidAmount = 0;
+        const allStudents = membersData.filter((member) => member.studentInfo);
+        const studentData = allStudents.map((member, index) => {
+          const memberPayments = paymentData.filter((payment) => payment.student._id === member._id);
+        
+          let studentTotalPending = 0;
+          let studentTotalPaidAmount = 0;
+        
+          memberPayments.forEach((payment) => {
+            if (payment.esewaPayments && payment.esewaPayments.length > 0) {
+              payment.esewaPayments.forEach((esewaPayment) => {
+                studentTotalPaidAmount += esewaPayment.amount;
+              });
+            }
+            studentTotalPending += payment.amount;
+          });
+        
+          totalPending += studentTotalPending;
+          totalPaidAmount += studentTotalPaidAmount;
+        
+          return {
+            id: member._id,
+            data: [
+              index + 1,
+              member.fullName,
+              member.studentInfo.grade.grade,
+              member.email,
+              member.contactNo,
+              `NPR ${studentTotalPending - studentTotalPaidAmount}`,
+              `NPR ${studentTotalPaidAmount}`
+            ]
+          };
+        });
+        
+        setAllStudents(allStudents);
+        setStudents(studentData);
+        setTotalPendingAmount(totalPending);
+        setTotalPaidAmount(totalPaidAmount);
+
+      } else {
+        console.error("Failed to fetch members");
+      }
+    } catch (error) {
+      console.error("Error fetching members data:", error);
+    }
+  };
+
   const headers = ["SN", "Student Name", "Grade", "Email", "Contact No", "Pending Amount", "Paid Amount"];
 
   const actionButtons = [

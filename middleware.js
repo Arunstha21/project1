@@ -55,8 +55,7 @@ export async function middleware(request) {
         '/api/members/attendance',
         '/api/members/[id]',
         '/api/feesRecord',
-        '/dashboard/student',
-        '/dashboard/attendance'
+        '/dashboard/student'
     ];
 
     if (userRole === 'admin') {
