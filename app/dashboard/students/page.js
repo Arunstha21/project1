@@ -1,5 +1,5 @@
 "use client";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import Table from "@/app/component/table";
 import AddMembers from "@/app/component/AddMembers";
 import { Edit, Trash } from "lucide-react";
@@ -61,7 +61,7 @@ export default function Student() {
     return `${day}-${month}-${year}`;
   };
 
-    const fetchTableData = async () => {
+    const fetchTableData = useCallback(async () => {
       try {
         const profile = await fetch("/api/users/profile", {
           method: "POST",
@@ -133,11 +133,11 @@ export default function Student() {
         console.error("Error fetching members data:", error);
         setError("Failed to fetch members data");
       }
-    };
+    },[ headersData.student, headersData.admin]);
 
     useEffect(()=>{
       fetchTableData()
-    })
+    }, [fetchTableData])
 
   const handleAddOrEditMember = () => {
     fetchTableData();

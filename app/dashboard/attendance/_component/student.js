@@ -31,7 +31,7 @@ export default function AttendanceStudent({studentId}) {
 
     useEffect(() => {
       updateDateAndMonth(currentDate);
-    });
+    },[currentDate]);
 
   function convertDateToYYYYMM(dateString) {
     const dateParts = dateString.split(' ');

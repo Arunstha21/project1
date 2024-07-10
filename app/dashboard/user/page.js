@@ -1,5 +1,5 @@
 "use client";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import Table from "@/app/component/table";
 import AddUsers from "@/app/component/AddUsers";
 import { Edit, Trash } from "lucide-react";
@@ -15,9 +15,9 @@ export default function Users() {
   const [userDbData, setUserDbData] = useState([]);
   const [userDataForEdit, setUserDataForEdit] = useState({});
 
-  const headersData = ["User Name", "Role", "Status"];
+  const headersData = useMemo(()=> ["User Name", "Role", "Status"], []);
 
-  const fetchTableData = async () => {
+  const fetchTableData = useCallback(async () => {
     try {
       const response = await fetch("/api/users", {
         method: "GET",
@@ -43,11 +43,11 @@ export default function Users() {
       console.error("Error fetching users data:", error);
       setError("Failed to fetch users data");
     }
-  };
+  },[headersData]);
 
   useEffect(() => {
     fetchTableData();
-  });
+  },[fetchTableData]);
 
   const handleAddOrEditUser = () => {
     fetchTableData();

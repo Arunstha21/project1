@@ -11,7 +11,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Header from "./header";
 
 export default function SideNav() {
@@ -19,7 +19,7 @@ export default function SideNav() {
   const [menuList, setMenuList] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const adminMenuList = [
+  const adminMenuList = useMemo(()=> [
     {
       id: 1,
       name: "Dashboard",
@@ -50,8 +50,8 @@ export default function SideNav() {
       icon: ScanBarcode,
       path: "/dashboard/payment",
     },
-  ];
-  const staffMenuList = [
+  ],[]);
+  const staffMenuList = useMemo(()=> [
     {
       id: 1,
       name: "Dashboard",
@@ -76,8 +76,8 @@ export default function SideNav() {
       icon: ScanBarcode,
       path: "/dashboard/payment",
     },
-  ];
-  const studentMenuList = [
+  ],[]);
+  const studentMenuList = useMemo(()=>[
     {
       id: 1,
       name: "Dashboard",
@@ -96,7 +96,7 @@ export default function SideNav() {
       icon: ScanBarcode,
       path: "/dashboard/payment",
     },
-  ];
+  ],[]);
   const path = usePathname();
 
   useEffect(() => {
@@ -127,7 +127,7 @@ export default function SideNav() {
     };
 
     fetchProfile();
-  });
+  },[adminMenuList, staffMenuList, studentMenuList]);
 
   return (
     <>

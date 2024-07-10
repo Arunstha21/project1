@@ -71,7 +71,7 @@ export default function InvoiceComponent({ action, studentId, allStudents }) {
     if (action === Landmark) {
       getInvoiceRecords();
     }
-  }, [action, getInvoiceRecords]);
+  }, [action]);
 
   if (action === ReceiptText) {
     const submit = async (event) => {

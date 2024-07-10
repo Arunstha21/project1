@@ -36,7 +36,7 @@ export default function AttendanceGrid({ attendanceList, selectedMonth, updateCh
     });
 
     setRowData(tableData);
-  }, [attendanceList]);
+  }, [attendanceList, daysArray]);
 
   const handleCheckboxChange = async (studentId, day, presentStatus, attendanceId) => {
     if (presentStatus) {
