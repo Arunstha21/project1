@@ -22,7 +22,6 @@ function Validate(id, title, value = "") {
 }
 
 export default function AddUsers({ isVisible, onClose, userDataForEdit, onAddOrEditUser }) {
-  if (!isVisible) return null;
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [formData, setFormData] = useState({});
@@ -128,7 +127,7 @@ export default function AddUsers({ isVisible, onClose, userDataForEdit, onAddOrE
   }
 
   return (
-    <div onClick={handleClose} id="wrapper" className="fixed inset-0 min-h-full min-w-full bg-gray-100 dark:bg-sky-950 bg-opacity-5 backdrop-blur-sm dark:bg-opacity-5 dark:backdrop-blur-sm py-6 flex flex-col justify-center sm:py-12">
+    <div onClick={handleClose} id="wrapper" className={`fixed inset-0 min-h-full min-w-full bg-gray-100 dark:bg-sky-950 bg-opacity-5 backdrop-blur-sm dark:bg-opacity-5 dark:backdrop-blur-sm py-6 flex flex-col justify-center sm:py-12 ${!isVisible ? 'hidden' : ''}`}>
       <div className="relative py-3 sm:max-w-xl sm:mx-auto">
         <div className="relative px-4 py-10 bg-white dark:bg-cyan-950 shadow-lg sm:rounded-3xl sm:p-20">
           <div className="max-w-md mx-auto">
