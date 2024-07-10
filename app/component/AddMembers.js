@@ -76,7 +76,7 @@ export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAd
 
     setFormData(initialFormData);
     setMemberType(type);
-  }, [isVisible, memberDataForEdit, generalFields, studentFields, staffFields]);
+  }, [isVisible, memberDataForEdit, generalFields, studentFields, staffFields, updatedStudentFields]);
 
   function handleFieldChange(tag, title, value = null) {
     setFormData((prevFormData) => ({
