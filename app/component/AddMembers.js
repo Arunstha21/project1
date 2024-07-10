@@ -5,8 +5,6 @@ import formFields from "./formFields.json";
 import Validate from "@/app/component/Validation";
 
 export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAddOrEditMember }) {
-  if (!isVisible) return null;
-
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [formData, setFormData] = useState({});
@@ -158,15 +156,10 @@ export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAd
     }
   }
 
-  function handleClose(e) {
-    if (e.target.id === "wrapper") {
-      onClose();
-    }
-  }
 
   return (
     <div
-      onClick={handleClose}
+      onClick={() => onClose()}
       id="wrapper"
       className={`fixed inset-0 min-h-full min-w-full bg-gray-100 dark:bg-sky-950 bg-opacity-5 backdrop-blur-sm dark:bg-opacity-5 dark:backdrop-blur-sm py-6 flex flex-col justify-center sm:py-12 ${!isVisible ? 'hidden' : ''}`}
     >

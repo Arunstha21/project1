@@ -13,7 +13,7 @@ export default function AttendanceGrid({ attendanceList, selectedMonth, updateCh
   useEffect(()=>{
     const newHeaders = ["Number", "Student Name", ...daysArray.map((date) => date.toString())];
     setHeaders(newHeaders);
-  },[selectedMonth])
+  },[selectedMonth, daysArray])
 
   useEffect(() => {
     const userList = getUniqueRecords();

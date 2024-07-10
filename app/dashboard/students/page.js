@@ -137,7 +137,7 @@ export default function Student() {
 
     useEffect(()=>{
       fetchTableData()
-    },[])
+    })
 
   const handleAddOrEditMember = () => {
     fetchTableData();

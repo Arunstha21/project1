@@ -47,7 +47,7 @@ export default function Users() {
 
   useEffect(() => {
     fetchTableData();
-  }, []);
+  });
 
   const handleAddOrEditUser = () => {
     fetchTableData();
