@@ -61,83 +61,77 @@ export default function Student() {
     return `${day}-${month}-${year}`;
   };
 
-    const fetchTableData = useCallback(async () => {
-      try {
-        const profile = await fetch("/api/users/profile", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!profile.ok) {
-          throw new Error("Failed to fetch profile");
-        }
-
-        const profileData = await profile.json();
-
-        const response = await fetch("/api/members", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch members data");
-        }
-
-        const data = await response.json();
-        setMemberDbData(data);
-        const members = data.map((item) => ({
-          id: item._id,
-          data: [
-            item.studentInfo
-              ? item.studentInfo.studentId
-              : item.staffInfo.employeeId,
-            item.fullName,
-            item.address,
-            item.contactNo,
-            formatDate(item.dateOfBirth),
-            item.email,
-            item.gender,
-            item.studentInfo
-              ? item.studentInfo.grade.grade
-              : item.staffInfo.department,
-            item.studentInfo
-              ? item.studentInfo.yearEnrolled
-              : item.staffInfo.position,
-            item.studentInfo ? "student" : "staff",
-          ],
-        }));
-
-        let filteredMembers;
-        if (profileData.role === "staff") {
-          setHeaders(headersData.student);
-          filteredMembers = members
-            .filter((member) => member.data[9] === "student")
-            .map((member) => ({
-              id: member.id,
-              data: member.data.slice(0, 9),
-            }));
-        } else {
-          setHeaders(headersData.admin);
-          filteredMembers = members.map((member) => ({
-            id: member.id,
-            data: member.data,
-          }));
-        }
-
-        setTableData(filteredMembers);
-      } catch (error) {
-        console.error("Error fetching members data:", error);
-        setError("Failed to fetch members data");
+  const fetchTableData = useCallback(async () => {
+    try {
+      const profileResponse = await fetch("/api/users/profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (!profileResponse.ok) {
+        throw new Error("Failed to fetch profile");
       }
-    },[ headersData.student, headersData.admin]);
+  
+      const profileData = await profileResponse.json();
+  
+      const membersResponse = await fetch("/api/members", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (!membersResponse.ok) {
+        throw new Error("Failed to fetch members data");
+      }
+  
+      const data = await membersResponse.json();
+      setMemberDbData(data);
+      const members = data.map((item) => ({
+        id: item._id,
+        data: [
+          item.studentInfo ? item.studentInfo.studentId : item.staffInfo.employeeId,
+          item.fullName,
+          item.address,
+          item.contactNo,
+          formatDate(item.dateOfBirth),
+          item.email,
+          item.gender,
+          item.studentInfo ? item.studentInfo.grade.grade : item.staffInfo.department,
+          item.studentInfo ? item.studentInfo.yearEnrolled : item.staffInfo.position,
+          item.studentInfo ? "student" : "staff",
+        ],
+      }));
+  
+      let filteredMembers;
+      if (profileData.role === "staff") {
+        setHeaders(headersData.student);
+        filteredMembers = members
+          .filter((member) => member.data[9] === "student")
+          .map((member) => ({
+            id: member.id,
+            data: member.data.slice(0, 9),
+          }));
+      } else {
+        setHeaders(headersData.admin);
+        filteredMembers = members.map((member) => ({
+          id: member.id,
+          data: member.data,
+        }));
+      }
+  
+      setTableData(filteredMembers);
+    } catch (error) {
+      console.error("Error fetching members data:", error);
+      setError("Failed to fetch members data");
+    }
+  }, [headersData.student, headersData.admin]);
 
     useEffect(()=>{
       fetchTableData()
-    }, [fetchTableData])
+    },[])
 
   const handleAddOrEditMember = () => {
     fetchTableData();

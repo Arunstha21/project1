@@ -1,19 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Table from "@/app/component/table";
 
 export default function AttendanceGrid({ attendanceList, selectedMonth, updateChecked }) {
   const [error, setError] = useState("");
   const [rowData, setRowData] = useState([]);
   const [headers, setHeaders] = useState(["Number", "Student Name"]);
-
   const daysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
   const [year, month] = selectedMonth.split("-").map(Number);
   const numberOfDays = daysInMonth(year, month - 1);
   const daysArray = Array.from({ length: numberOfDays }, (_, i) => i + 1);
+  const addHeaders = daysArray.map((date) => date.toString());
+
   useEffect(()=>{
-    const newHeaders = ["Number", "Student Name", ...daysArray.map((date) => date.toString())];
-    setHeaders(newHeaders);
-  },[selectedMonth, daysArray])
+    setHeaders([...headers, ...addHeaders]);
+  },[selectedMonth])
 
   useEffect(() => {
     const userList = getUniqueRecords();
@@ -36,7 +36,7 @@ export default function AttendanceGrid({ attendanceList, selectedMonth, updateCh
     });
 
     setRowData(tableData);
-  }, [attendanceList, daysArray]);
+  }, [attendanceList]);
 
   const handleCheckboxChange = async (studentId, day, presentStatus, attendanceId) => {
     if (presentStatus) {
