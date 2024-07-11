@@ -3,7 +3,7 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import Table from "@/app/component/table";
 import AddMembers from "@/app/component/AddMembers";
 import { Edit, Trash } from "lucide-react";
-import { Card, CardContent } from "../payment/_component/card";
+import CsvUpload from "./_component/Import";
 
 export default function Student() {
   const [error, setError] = useState("");
@@ -208,6 +208,9 @@ export default function Student() {
               className="block p-3 ps-10 text-sm text-gray-900 border border-sky-500 rounded-lg w-50 sm:w-80 bg-gray-50 focus:ring-sky-500 focus:border-sky-500 dark:bg-cyan-950 dark:border-sky-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-sky-500 dark:focus:border-sky-500"
               placeholder="Search for items"
             />
+          </div>
+          <div>
+            <CsvUpload fetchTableData={fetchTableData}/>
           </div>
           <div className=" left-0">
             <button onClick={()=>{setIsAddMembersPopupOpen(true)}} className="bg-cyan-500 right-0 hover:bg-cyan-400 dark:hover:bg-cyan-600 text-white dark:bg-cyan-700 rounded-md px-4 mt-8 mr-8 py-2">

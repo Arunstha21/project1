@@ -3,6 +3,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import Table from "@/app/component/table";
 import AddUsers from "@/app/component/AddUsers";
 import { Edit, Trash } from "lucide-react";
+import { Card, CardContent } from "../payment/_component/card";
 
 export default function Users() {
   const [error, setError] = useState("");
@@ -164,14 +165,18 @@ export default function Users() {
             </div>
           </div>
         )}
-        <div className="overflow-x-auto shadow-md sm:rounded-lg">
-          {/* Table and other components */}
-          <Table
-            headers={headers}
-            data={tableData}
-            actionButtons={actionButtons}
-          />
-        </div>
+        <Card className='w-5/12'>
+          <CardContent className="p-5">
+            <div className="overflow-x-auto shadow-md sm:rounded-lg">
+            <Table
+              headers={headers}
+              data={tableData}
+              actionButtons={actionButtons}
+            />
+          </div>
+          </CardContent>
+        </Card>
+
         {error && <Alert type="error" message={error} />}
         {isEditAddUserPopupOpen && (
           <AddUsers

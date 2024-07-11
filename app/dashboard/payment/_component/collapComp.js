@@ -9,7 +9,7 @@ const formFields = require("@/app/component/formFields.json");
 
 const { invoiceFields } = formFields;
 
-export default function InvoiceComponent({ action, studentId, allStudents }) {
+export default function InvoiceComponent({ action, studentId, allStudents, fetchPaymentData }) {
   const [error, setError] = useState();
   const [success, setSuccess] = useState();
   const [invoiceFormData, setInvoiceFormData] = useState({});
@@ -21,6 +21,8 @@ export default function InvoiceComponent({ action, studentId, allStudents }) {
   );
   const [makePaymentButton, setMakePaymentButton] = useState("Make Payment")
   const [invoiceOf, setInvoiceOf] = useState();
+  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
+  const [deletingFeesId, setDeletingFeesId] = useState(null);
 
   async function getInvoiceRecords() {
     try {
@@ -111,6 +113,7 @@ export default function InvoiceComponent({ action, studentId, allStudents }) {
           const res = await response.json();
           if (response.ok) {
             setSuccess(res.message);
+            fetchPaymentData()
             setError("");
           } else {
             setError(res.error || "An error occurred");
@@ -168,26 +171,85 @@ export default function InvoiceComponent({ action, studentId, allStudents }) {
         label: Trash,
         color: "red",
         onClick: (id) => {
-          console.log("Delete CLicked");
+          setDeletingFeesId(id);
+          setDeleteConfirmation(true);
         },
       },
     ];
 
+
+  const confirmDelete = async () => {
+    try {
+      const response = await fetch(`/api/payment/feesRecord/${deletingFeesId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete member");
+      }
+      fetchPaymentData();
+      getInvoiceRecords();
+      setDeleteConfirmation(false);
+    } catch (error) {
+      console.error("Error deleting member:", error);
+      setError("Failed to delete member");
+    }
+  };
+
+  
+    if (invoiceTableData?.length > 0) {
+      return (
+        <div>
+        {deleteConfirmation && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-8 rounded-lg dark:bg-cyan-950 shadow-lg text-center ">
+              <p className="text-lg font-semibold">
+                Are you sure you want to delete data ?
+              </p>
+              <div className="mt-4 space-x-4">
+                <button
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
+                  onClick={confirmDelete}
+                >
+                  Confirm Delete
+                </button>
+                <button
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md"
+                  onClick={() => setDeleteConfirmation(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        <Card>
+          <CardHeader>
+            <CardTitle>Invoice Records {invoiceOf}</CardTitle>
+          </CardHeader>
+          <CardContent className="font-bold">
+            <Table
+              headers={headers}
+              actionButtons={actionButtons}
+              data={invoiceTableData}
+            />
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+          </CardContent>
+        </Card>
+        </div>
+      )
+    }
+  
+
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Invoice Records {invoiceOf}</CardTitle>
+          <CardTitle>No Invoice Records</CardTitle>
         </CardHeader>
-        <CardContent className="font-bold">
-          <Table
-            headers={headers}
-            actionButtons={actionButtons}
-            data={invoiceTableData}
-          />
-          {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-        </CardContent>
-      </Card>
-    );
+      </Card>);
   } else if (action === "Make Payment") {
     const submit = async () => {
         try {

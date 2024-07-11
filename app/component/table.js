@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Collapsible } from "../dashboard/payment/_component/Collapsible";
 import InvoiceComponent from "../dashboard/payment/_component/collapComp";
 
-export default function Table({ headers, data, actionButtons, payment }) {
+export default function Table({ headers, data, actionButtons, payment, fetchPaymentData }) {
   const [tableData, setTableData] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
   const [action, setAction] = useState();
@@ -125,6 +125,7 @@ export default function Table({ headers, data, actionButtons, payment }) {
                         allStudents={payment}
                         action={action}
                         studentId={studentId}
+                        fetchPaymentData={fetchPaymentData}
                       />
                     </Collapsible>
                   </td>

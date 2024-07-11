@@ -35,7 +35,6 @@ export default function AdminPaymentPage() {
       if (members.ok) {
         const membersData = await members.json();
         const paymentData = await payment.json();
-        console.log(paymentData);
         let totalPending = 0;
         let totalPaidAmount = 0;
         const allStudents = membersData.filter((member) => member.studentInfo);
@@ -132,6 +131,7 @@ export default function AdminPaymentPage() {
             data={students}
             actionButtons={actionButtons}
             payment={allStudents}
+            fetchPaymentData={fetchTableData}
           />
         </CardContent>
       </Card>
