@@ -165,7 +165,7 @@ export default function Users() {
             </div>
           </div>
         )}
-        <Card className='w-5/12'>
+        <Card className='xl:w-5/12'>
           <CardContent className="p-5">
             <div className="overflow-x-auto shadow-md sm:rounded-lg">
             <Table

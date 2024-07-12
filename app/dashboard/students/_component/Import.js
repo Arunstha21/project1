@@ -85,7 +85,7 @@ export default function CsvUpload({ fetchTableData }) {
       </button>
       {modalIsOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="dark:bg-cyan-700 p-8 rounded-lg shadow-lg w-96">
+          <div className="dark:bg-cyan-700 p-8 bg-white rounded-lg shadow-lg w-96">
             <label
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               for="file_input"
