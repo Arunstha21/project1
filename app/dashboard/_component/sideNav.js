@@ -131,7 +131,7 @@ export default function SideNav() {
 
   return (
     <>
-        <div>
+      <div>
         <button
           className="md:hidden text-gray-900 mt-5 ml-5 dark:text-gray-300"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -140,8 +140,8 @@ export default function SideNav() {
         </button>
       </div>
       <div
-        className={`lg:flex flex-col border-2 border-sky-500 rounded-lg shadow-md bg-white text-gray-900 dark:bg-cyan-950 dark:text-gray-300 h-screen p-5 transition-transform duration-300 ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        className={`fixed lg:relative lg:flex flex-col border-2 border-sky-500 rounded-lg shadow-md bg-white text-gray-900 dark:bg-cyan-950 dark:text-gray-300 h-screen p-5 transition-transform duration-300 ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
         {!isSidebarOpen && (

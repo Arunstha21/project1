@@ -81,8 +81,9 @@ export const DELETE = async (req, res) => {
     try {
         await connect();
         const data = await req.json();
-        await Attendance.findByIdAndDelete(data);
-        return NextResponse.json({ message: `Student ID: ${data.student} marked as absent !` }, {status: 200})
+        const id = data.attendanceId;
+        await Attendance.findByIdAndDelete(id);
+        return NextResponse.json({ message: `Student marked as absent !` }, {status: 200})
 
     } catch (error) {
         return NextResponse.json({error: error.message}, {status: 500})

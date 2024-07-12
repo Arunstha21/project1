@@ -59,14 +59,14 @@ export default function Calendar ({attendanceData, selectedMonth, updateDateAndM
         if (week === 0 && weekDay < firstDayOfMonth) {
           // Previous month days
           weekDays.push(
-            <div key={`empty-${weekDay}`} className="flex h-12 items-center justify-center mt-2 rounded-md text-sm font-medium bg-neutral-950 opacity-20">
+            <div key={`empty-${weekDay}`} className="flex h-12 items-center justify-center mt-2 rounded-md text-sm font-medium bg-neutral-950 bg-opacity-25">
               {prevMonthDays[weekDay]}
             </div>
           );
         } else if (day > daysInMonth) {
           // Next month days
           weekDays.push(
-            <div key={`empty-${weekDay}`} className="flex h-12 items-center justify-center mt-2 rounded-md text-sm font-medium bg-neutral-950 opacity-20">
+            <div key={`empty-${weekDay}`} className="flex h-12 items-center justify-center mt-2 rounded-md text-sm font-medium bg-neutral-950 bg-opacity-25">
               {nextMonthDays.shift()}
             </div>
           );
