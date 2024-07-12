@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import FormFields from "@/app/component/FormFields";
 import { Card, CardHeader, CardTitle, CardContent } from "./card";
-import { Edit, Landmark, ReceiptText, Trash } from "lucide-react";
+import { Check, Edit, Landmark, ReceiptText, Trash } from "lucide-react";
 import Table from "@/app/component/table";
 import { uid } from 'uid';
 import {GetEsewaPaymentHash} from "@/app/helpers/getEsewaPaymentHash";
+import { useRouter } from "next/router";
 const formFields = require("@/app/component/formFields.json");
 
 const { invoiceFields } = formFields;
@@ -23,6 +24,8 @@ export default function InvoiceComponent({ action, studentId, allStudents, fetch
   const [invoiceOf, setInvoiceOf] = useState();
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const [deletingFeesId, setDeletingFeesId] = useState(null);
+  const [isEditing, setIsEditing] = useState({status: false, id: null});
+  const router = useRouter();
 
   async function getInvoiceRecords() {
     try {
@@ -44,6 +47,7 @@ export default function InvoiceComponent({ action, studentId, allStudents, fetch
               }
             
             return {
+              isPaid : status === "Paid" ? true : false,
               id: item._id,
               data: [
                 index + 1,
@@ -164,7 +168,7 @@ export default function InvoiceComponent({ action, studentId, allStudents, fetch
         label: Edit,
         color: "blue",
         onClick: (id) => {
-          console.log("Edit CLicked");
+          setIsEditing({status: !isEditing.status, id: id})
         },
       },
       {
@@ -175,7 +179,40 @@ export default function InvoiceComponent({ action, studentId, allStudents, fetch
           setDeleteConfirmation(true);
         },
       },
+      {
+        label: Check,
+        color: "white",
+        onClick: ( data) => {
+          submitEdit(data)
+        },
+      }
     ];
+
+    async function submitEdit(data){
+      const updatedData = {
+        amount: data.data[2],
+        month: data.data[1]
+      }
+
+      try {
+        const response = await fetch(`/api/payment/feesRecord/${data.id}`,{
+          method: "PUT",
+          body: JSON.stringify(updatedData)
+        })
+        const res = await response.json();
+        if (response.ok) {
+          fetchPaymentData();
+          getInvoiceRecords();
+          setIsEditing({status: !isEditing.status, id: null})
+        }
+        if (response.status === 404) {
+          setError(res.error);
+        }
+      } catch (error) {
+        setError("Error Updating data", error);
+      }
+    }
+
 
 
   const confirmDelete = async () => {
@@ -188,18 +225,17 @@ export default function InvoiceComponent({ action, studentId, allStudents, fetch
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete member");
+        throw new Error("Failed to delete invoice record");
       }
       fetchPaymentData();
       getInvoiceRecords();
       setDeleteConfirmation(false);
     } catch (error) {
-      console.error("Error deleting member:", error);
-      setError("Failed to delete member");
+      console.error("Error deleting invoice record:", error);
+      setError("Failed to delete invoice record");
     }
   };
 
-  
     if (invoiceTableData?.length > 0) {
       return (
         <div>
@@ -235,6 +271,7 @@ export default function InvoiceComponent({ action, studentId, allStudents, fetch
               headers={headers}
               actionButtons={actionButtons}
               data={invoiceTableData}
+              isEditing={isEditing}
             />
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           </CardContent>
@@ -242,7 +279,6 @@ export default function InvoiceComponent({ action, studentId, allStudents, fetch
         </div>
       )
     }
-  
 
     return (
       <Card>
@@ -264,7 +300,7 @@ export default function InvoiceComponent({ action, studentId, allStudents, fetch
           form.method = 'POST';
           form.action = 'https://rc-epay.esewa.com.np/api/epay/main/v2/form';
 
-          const successUrl = `http://localhost:3000/api/payment/esewa/success`
+          const successUrl = `${router.asPath}/api/payment/esewa/success`
     
           const inputs = [
             { name: 'amount', value: makePaymentAmount },
@@ -275,7 +311,7 @@ export default function InvoiceComponent({ action, studentId, allStudents, fetch
             { name: 'product_service_charge', value: '0' },
             { name: 'product_delivery_charge', value: '0' },
             { name: 'success_url', value: successUrl },
-            { name: 'failure_url', value: 'http://localhost:3000/api/payment/esewa/fail' },
+            { name: 'failure_url', value: `${router.asPath}/api/payment/esewa/fail` },
             { name: 'signed_field_names', value: esewaHash.signed_field_names },
             { name: 'signature', value: esewaHash.signature },
           ];

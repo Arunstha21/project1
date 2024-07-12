@@ -2,16 +2,37 @@ import React, { useState, useEffect } from "react";
 import { Collapsible } from "../dashboard/payment/_component/Collapsible";
 import InvoiceComponent from "../dashboard/payment/_component/collapComp";
 
-export default function Table({ headers, data, actionButtons, payment, fetchPaymentData }) {
+export default function Table({ headers, data, actionButtons, payment, fetchPaymentData, isEditing}) {
   const [tableData, setTableData] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
   const [action, setAction] = useState();
   const [studentId, setStudentId] = useState();
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [editingRowIndex, setEditingRowIndex] = useState(null);
 
   useEffect(() => {
     setTableData(data);
+
   }, [data]);
+
+  useEffect(() => {
+    if (!isEditing) {
+      return;
+    }
+    if (!isEditing.status) {
+      setEditingRowIndex(null)
+    }
+    if (isEditing.status) {
+      setEditingRowIndex(isEditing.id)
+    }
+  }, [isEditing]);
+
+
+  const handleInputChange = (value, rowIndex, columnIndex) => {
+    const newData = [...data];
+    newData[rowIndex].data[columnIndex] = value;
+    setTableData(newData);
+  };
 
   const handleRowToggle = (rowIndex, action, studentId) => {
     setSelectedRow(selectedRow === rowIndex ? null : rowIndex);
@@ -78,21 +99,58 @@ export default function Table({ headers, data, actionButtons, payment, fetchPaym
               >
                 {row.data.map((item, columnIndex) => (
                   <td key={columnIndex} className="dark:text-white px-6 py-4">
-                    {typeof item.value === "boolean" ? (
-                      <input
-                        type="checkbox"
-                        onChange={item.onchange}
-                        checked={item.value}
-                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded hover:ring-blue-500 dark:hover:ring-blue-600 dark:ring-offset-gray-800 hover:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
-                    ) : (
-                      item
+                    {editingRowIndex === row.id && (
+                      ((columnIndex === 1 || columnIndex === 2) && (
+                        <input
+                          type={columnIndex === 1 ? "month" : "text"}
+                          value={item}
+                          onChange={(e) => handleInputChange(e.target.value, rowIndex, columnIndex)}
+                          className="peer placeholder-transparent h-10 border-b-2 border-gray-300 text-gray-900 dark:bg-cyan-950 dark:text-gray-300 focus:outline-none focus:border-rose-600"
+                        />
+                      )) || (
+                        item
+                      )
+                    )}
+                    {editingRowIndex !== row.id && (
+                      typeof item.value === "boolean" ? (
+                        <input
+                          type="checkbox"
+                          onChange={item.onChange}
+                          checked={item.value}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded hover:ring-blue-500 dark:hover:ring-blue-600 dark:ring-offset-gray-800 hover:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                      ) : (
+                        item
+                      )
                     )}
                   </td>
                 ))}
-                {actionButtons && (
+                {editingRowIndex === row.id &&(actionButtons && (
                   <td className="flex items-center px-6 py-4">
-                    {actionButtons.map((button, buttonIndex) => (
+                    {actionButtons.slice(2,3).map((button, buttonIndex) => (
+                      <button
+                        key={buttonIndex}
+                        onClick={() => {
+                           if(isEditing?.status){
+                            button.onClick(row);
+                          }
+                        }}
+                        className={`font-medium text-${
+                          button.color
+                        }-600 dark:text-${button.color}-500 ${button.extraClass} hover:underline mx-3`}
+                      >
+                        {typeof button.label === "string" ? (
+                          button.label
+                        ) : (
+                          <button.label />
+                        )}
+                      </button>
+                    ))}
+                    </td>
+                ))}
+                {editingRowIndex !== row.id && (actionButtons && (
+                  <td className="flex items-center px-6 py-4">
+                    {actionButtons.slice(0,2).map((button, buttonIndex) => (
                       <button
                         key={buttonIndex}
                         onClick={() => {
@@ -115,7 +173,7 @@ export default function Table({ headers, data, actionButtons, payment, fetchPaym
                       </button>
                     ))}
                   </td>
-                )}
+                ))}
               </tr>
               {selectedRow === rowIndex && (
                 <tr>
