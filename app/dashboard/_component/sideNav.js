@@ -133,7 +133,7 @@ export default function SideNav() {
     <>
       <div>
         <button
-          className="md:hidden text-gray-900 mt-5 ml-5 dark:text-gray-300"
+          className="lg:hidden text-gray-900 mt-5 ml-5 dark:text-gray-300"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         >
           {isSidebarOpen ? "Close" : "Menu"}
