@@ -5,13 +5,13 @@ import { Check, Edit, Landmark, ReceiptText, Trash } from "lucide-react";
 import Table from "@/app/component/table";
 import { uid } from 'uid';
 import {GetEsewaPaymentHash} from "@/app/helpers/getEsewaPaymentHash";
-import { useRouter } from "next/router";
+import Invoice from "@/app/component/invoice";
 const formFields = require("@/app/component/formFields.json");
 
 const { invoiceFields } = formFields;
 
 export default function InvoiceComponent({ action, studentId, allStudents, fetchPaymentData }) {
-  const [error, setError] = useState();
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState();
   const [invoiceFormData, setInvoiceFormData] = useState({});
   const [invoiceTableData, setInvoiceTableData] = useState();
@@ -25,7 +25,15 @@ export default function InvoiceComponent({ action, studentId, allStudents, fetch
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const [deletingFeesId, setDeletingFeesId] = useState(null);
   const [isEditing, setIsEditing] = useState({status: false, id: null});
-  const router = useRouter();
+  const [currentUrl, setCurrentUrl] = useState('');
+  const [generateInvoice, setGenerateInvoice] = useState(false)
+  const [invoiceData, setInvoiceData] = useState();
+
+  useEffect(() => {
+    if (process) {
+      setCurrentUrl(window.location.origin);
+    }
+  }, []);
 
   async function getInvoiceRecords() {
     try {
@@ -79,10 +87,16 @@ export default function InvoiceComponent({ action, studentId, allStudents, fetch
     }
   }, [action]);
 
+  function clearError() {
+    setInterval(() => {
+      setError("");
+    }, 4000);
+  }
+
   if (action === ReceiptText) {
     const submit = async (event) => {
         event.preventDefault();
-        
+        setError("");
         const uuid = uid(16);
         let updatedFormData = {};
         invoiceFields.forEach((field) => {
@@ -92,42 +106,91 @@ export default function InvoiceComponent({ action, studentId, allStudents, fetch
             value: invoiceFormData[tag]?.value || "",
             title: title,
           };
+
+          if (tag === 'month') {
+            const monthValue = updatedFormData[tag].value;
+            const monthRegex = /^\d{4}-(0[1-9]|1[0-2])$/;
+            if (!monthRegex.test(monthValue)) {
+              setError(`Invalid format for ${title}. Use YYYY-MM format.`);
+              clearError()
+            } else {
+              const selectedDate = new Date(monthValue);
+              const currentDate = new Date();
+              const maxDate = new Date(currentDate.getFullYear() + 2, currentDate.getMonth(), currentDate.getDate());
+              const minDate = new Date(currentDate.getFullYear() - 2, currentDate.getMonth(), currentDate.getDate());
+              
+              if (selectedDate > maxDate || selectedDate < minDate) {
+                setError(`${title} must be within 2 years from now.`);
+                clearError()
+              }
+            }
+          }
+          if (tag === 'amount') {
+            const amountValue = updatedFormData[tag].value;
+            if (parseFloat(amountValue) < 0) {
+              setError(`${title} cannot be negative.`);
+              clearError()
+            }
+          }
         });
         const studentData = allStudents.find(
           (student) => student._id === studentId
         );
-    
-        try {
-          const response = await fetch("/api/payment/feesRecord", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(
-              Object.keys(updatedFormData).reduce(
-                (acc, key) => {
-                  acc[key] = updatedFormData[key].value;
-                  return acc;
-                },
-                { student: studentId, grade: studentData.studentInfo.grade._id,transactionUuid: uuid  }
-              )
-            ),
-          });
-    
-          const res = await response.json();
-          if (response.ok) {
-            setSuccess(res.message);
-            fetchPaymentData()
-            setError("");
-          } else {
-            setError(res.error || "An error occurred");
+
+        if (error != "") {
+          return;
+        }else {
+          try {
+            const response = await fetch("/api/payment/feesRecord", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(
+                Object.keys(updatedFormData).reduce(
+                  (acc, key) => {
+                    acc[key] = updatedFormData[key].value;
+                    return acc;
+                  },
+                  { student: studentId, grade: studentData.studentInfo.grade._id,transactionUuid: uuid  }
+                )
+              ),
+            });
+      
+            const res = await response.json();
+            if (response.ok) {
+              setSuccess(res.message);
+              fetchPaymentData()
+              const invoiceData = {
+                invoiceNumber: res.feesRecord?.transactionUuid,
+                date:  res.feesRecord?.month,
+                studentName:  res.feesRecord?.student.fullName,
+                address: res.feesRecord?.student.address,
+                contact: res.feesRecord?.student.contactNo,
+                className:  res.feesRecord?.grade.grade,
+                items: [
+                  { description: 'Fees', amount: res.feesRecord?.amount },
+                ],
+                total: res.feesRecord?.amount,
+              }
+              if(generateInvoice){
+                setInvoiceData(invoiceData);
+              }
+              setError("");
+            } else {
+              setError(res.error || "An error occurred");
+            }
+          } catch (error) {
+            setError(error.message || "Failed to submit data.");
           }
-        } catch (error) {
-          setError(error.message || "Failed to submit data.");
         }
+    
+
       };
 
     return (
+      <div>
+
       <Card>
         <CardHeader>
           <CardTitle>Create Invoice</CardTitle>
@@ -135,31 +198,38 @@ export default function InvoiceComponent({ action, studentId, allStudents, fetch
         <CardContent className="flex gap-5 items-center font-bold">
           {invoiceFields.map((field, index) => (
             <FormFields
-              key={index}
-              field={field.field}
-              tag={field.tag}
-              title={field.title}
-              type={field.type}
-              required={field.required}
-              onChangeValue={(e) =>
-                handleFieldChange(field.tag, field.title, e.target.value)
-              }
+            key={index}
+            field={field.field}
+            tag={field.tag}
+            title={field.title}
+            type={field.type}
+            required={field.required}
+            onChangeValue={(e) =>
+              handleFieldChange(field.tag, field.title, e.target.value)
+            }
             />
-          ))}
+            ))}
           <button
             id="submit"
             onClick={submit}
             className="bg-cyan-500 hover:bg-cyan-400 dark:hover:bg-cyan-600 text-white dark:bg-cyan-700 rounded-md px-2 py-1"
-          >
+            >
             Submit
           </button>
+          <input type="checkbox" value={generateInvoice} onChange={(e) => setGenerateInvoice(e.target.checked)} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded hover:ring-blue-500 dark:hover:ring-blue-600 dark:ring-offset-gray-800 hover:ring-2 dark:bg-gray-700 dark:border-gray-600"></input>
+          <label>
+            Generate Invoice
+          </label>
 
           {success && (
             <p className="text-black dark:text-white text-sm mt-1">{success}</p>
-          )}
+            )}
           {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
         </CardContent>
       </Card>
+      {(generateInvoice && invoiceData) ? <Invoice invoiceData={invoiceData}/> : ""}
+    </div>
+      
     );
   } else if (action === Landmark) {
     const headers = ["SN", "Month", "Amount", "Paid Amount", "Status"];
@@ -300,7 +370,7 @@ export default function InvoiceComponent({ action, studentId, allStudents, fetch
           form.method = 'POST';
           form.action = 'https://rc-epay.esewa.com.np/api/epay/main/v2/form';
 
-          const successUrl = `${router.asPath}/api/payment/esewa/success`
+          const successUrl = `${currentUrl}/api/payment/esewa/success`
     
           const inputs = [
             { name: 'amount', value: makePaymentAmount },
@@ -311,7 +381,7 @@ export default function InvoiceComponent({ action, studentId, allStudents, fetch
             { name: 'product_service_charge', value: '0' },
             { name: 'product_delivery_charge', value: '0' },
             { name: 'success_url', value: successUrl },
-            { name: 'failure_url', value: `${router.asPath}/api/payment/esewa/fail` },
+            { name: 'failure_url', value: `${currentUrl}/api/payment/esewa/fail` },
             { name: 'signed_field_names', value: esewaHash.signed_field_names },
             { name: 'signature', value: esewaHash.signature },
           ];

@@ -1,6 +1,7 @@
 "use client";
 import { Fragment, useEffect, useState } from "react";
 import AttendanceGrid from "../_component/AttendanceGrid";
+import SearchComponent from "@/app/component/Search";
 
 export default function AdminAttendance() {
 
@@ -9,6 +10,7 @@ export default function AdminAttendance() {
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedGrade, setSelectedGrade] = useState();
   const [attendanceList, setAttendanceList] = useState();
+  const [searchQuery, setSearchQuery] = useState();
 
   useEffect(() => {
     const today = new Date();
@@ -59,7 +61,6 @@ export default function AdminAttendance() {
       });
       if (response.ok) {
         const gradeStudentData = await response.json();
-        console.log(gradeStudentData);
         setAttendanceList(gradeStudentData);
       } else {
         console.error("Failed to fetch student data");
@@ -72,8 +73,13 @@ export default function AdminAttendance() {
   return (
     <Fragment>
       <div className="overflow-x-auto shadow-md sm:rounded-lg">
-        <div className="pb-4 flex gap-4 p-3 border rounded-lg shadow-md items-center">
-          <div className="flex gap-2">
+      <div className=" border rounded-lg shadow-md items-center">
+        <div className="flex justify-between iteams-center">
+        <div className="mt-10">
+          <SearchComponent queryInput={(v) => setSearchQuery(v)}/>
+          </div>
+          <div className="flex gap-2 mt-10 m-2">
+          <div>
             <input
               type="month"
               value={selectedMonth}
@@ -102,9 +108,12 @@ export default function AdminAttendance() {
               Search
             </button>
           </div>
+          </div>
         </div>
+        </div>
+
         <div className="mt-5 flex items-center">
-          <AttendanceGrid attendanceList={attendanceList} updateChecked={search} selectedMonth={selectedMonth}/>
+          <AttendanceGrid attendanceList={attendanceList} updateChecked={search} selectedMonth={selectedMonth} searchQuery={searchQuery}/>
         </div>
       </div>
     </Fragment>

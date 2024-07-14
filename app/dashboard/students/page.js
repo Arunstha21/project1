@@ -4,6 +4,7 @@ import Table from "@/app/component/table";
 import AddMembers from "@/app/component/AddMembers";
 import { Edit, Trash } from "lucide-react";
 import CsvUpload from "./_component/Import";
+import SearchComponent from "@/app/component/Search";
 
 export default function Student() {
   const [error, setError] = useState("");
@@ -15,6 +16,22 @@ export default function Student() {
   const [deletingMemberId, setDeletingMemberId] = useState(null);
   const [memberDbData, setMemberDbData] = useState([]);
   const [memberDataForEdit, setMemberDataForEdit] = useState({});
+  const [searchQuery, setSearchQuery] = useState();
+  const [filteredData, setFilteredData] = useState(tableData);
+
+  useEffect(() => {
+    if (!searchQuery) {
+      setFilteredData(tableData);
+    } else {
+      const filtered = tableData.filter(item =>
+        item.data.some(value => {
+          const stringValue = typeof value === 'number' ? value.toString() : value;
+          return stringValue.toLowerCase().includes(searchQuery.toLowerCase());
+        })
+      );
+      setFilteredData(filtered);
+    }
+  }, [searchQuery, tableData]);
 
   const headersData = {
     student: [
@@ -198,16 +215,8 @@ export default function Student() {
       <Fragment>
           <div className="overflow-x-auto shadow-md sm:rounded-lg">
         <div className="pb-4 flex justify-between items-center">
-          <label htmlFor="table-search" className="sr-only">
-            Search
-          </label>
-          <div className=" mt-10 m-2">
-            <input
-              type="text"
-              id="table-search"
-              className="block p-3 ps-10 text-sm text-gray-900 border border-sky-500 rounded-lg w-50 sm:w-80 bg-gray-50 focus:ring-sky-500 focus:border-sky-500 dark:bg-cyan-950 dark:border-sky-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-sky-500 dark:focus:border-sky-500"
-              placeholder="Search for items"
-            />
+          <div className="mt-10">
+          <SearchComponent queryInput={(v) => setSearchQuery(v)}/>
           </div>
           <div>
             <CsvUpload fetchTableData={fetchTableData}/>
@@ -250,7 +259,7 @@ export default function Student() {
       <div className="overflow-x-auto shadow-md sm:rounded-lg">
         <Table
           headers={headers}
-          data={tableData}
+          data={filteredData}
           actionButtons={actionButtons}
         />
       </div>

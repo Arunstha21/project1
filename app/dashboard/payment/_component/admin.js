@@ -7,6 +7,7 @@ import {
 } from "./card";
 import Table from "@/app/component/table";
 import { Landmark, Pause, ReceiptText } from "lucide-react";
+import SearchComponent from "@/app/component/Search";
 
 
 export default function AdminPaymentPage() {
@@ -14,11 +15,27 @@ export default function AdminPaymentPage() {
   const [allStudents, setAllStudents] = useState();
   const [totalPendingAmount, setTotalPendingAmount] = useState();
   const [totalPaidAmount, setTotalPaidAmount] = useState();
+  const [searchQuery, setSearchQuery] = useState();
+  const [filteredData, setFilteredData] = useState(students);
 
 
   useEffect(() => {
     fetchTableData();
   }, []);
+
+  useEffect(() => {
+    if (!searchQuery) {
+      setFilteredData(students);
+    } else {
+      const filtered = students.filter(item =>
+        item.data.slice(1, 5).some(value => {
+          const stringValue = typeof value === 'number' ? value.toString() : value;
+          return stringValue.toLowerCase().includes(searchQuery.toLowerCase());
+        })
+      );
+      setFilteredData(filtered);
+    }
+  }, [searchQuery, students]);
   
   const fetchTableData = async () => {
     try {
@@ -126,9 +143,10 @@ export default function AdminPaymentPage() {
           <CardTitle>Student Payments</CardTitle>
         </CardHeader>
         <CardContent>
+          <SearchComponent queryInput={(v) => setSearchQuery(v)}/>
           <Table
             headers={headers}
-            data={students}
+            data={filteredData}
             actionButtons={actionButtons}
             payment={allStudents}
             fetchPaymentData={fetchTableData}

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Table from "@/app/component/table";
 
-export default function AttendanceGrid({ attendanceList, selectedMonth, updateChecked }) {
+export default function AttendanceGrid({ attendanceList, selectedMonth, updateChecked, searchQuery }) {
   const [error, setError] = useState("");
   const [rowData, setRowData] = useState([]);
   const [headers, setHeaders] = useState(["Number", "Student Name"]);
@@ -10,6 +10,7 @@ export default function AttendanceGrid({ attendanceList, selectedMonth, updateCh
   const numberOfDays = daysInMonth(year, month - 1);
   const daysArray = Array.from({ length: numberOfDays }, (_, i) => i + 1);
   const addHeaders = daysArray.map((date) => date.toString());
+  const [filteredRowData, setFilteredRowData] = useState(rowData);
 
   useEffect(()=>{
     setHeaders([...headers, ...addHeaders]);
@@ -38,6 +39,22 @@ export default function AttendanceGrid({ attendanceList, selectedMonth, updateCh
     setRowData(tableData);
   }, [attendanceList]);
 
+  useEffect(() => {
+    if (!searchQuery) {
+      setFilteredRowData(rowData);
+    } else {
+      const filtered = rowData.filter(item => {
+        const value = item.data[1];
+        if (typeof value === 'undefined') {
+          return false;
+        }
+        const stringValue = typeof value === 'number' ? value.toString() : value;
+        return stringValue.toLowerCase().includes(searchQuery.toLowerCase());
+      });
+      setFilteredRowData(filtered);
+    }
+  }, [searchQuery, rowData]);
+
   const handleCheckboxChange = async (studentId, day, presentStatus, attendanceId) => {
     if (presentStatus) {
       const data = {
@@ -60,7 +77,6 @@ export default function AttendanceGrid({ attendanceList, selectedMonth, updateCh
         setError(error.toString());
       }
     } else {
-      console.log(attendanceId);
       try {
         const response = await fetch("/api/members/attendance", {
           method: "DELETE",
@@ -96,7 +112,7 @@ export default function AttendanceGrid({ attendanceList, selectedMonth, updateCh
 
   return (
     <div className="overflow-y-auto">
-      <Table headers={headers} data={rowData} />
+      <Table headers={headers} data={filteredRowData} />
       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
     </div>
   );

@@ -4,6 +4,7 @@ import Table from "@/app/component/table";
 import AddUsers from "@/app/component/AddUsers";
 import { Edit, Trash } from "lucide-react";
 import { Card, CardContent } from "../payment/_component/card";
+import SearchComponent from "@/app/component/Search";
 
 export default function Users() {
   const [error, setError] = useState("");
@@ -15,8 +16,23 @@ export default function Users() {
   const [deletingUserId, setDeletingUserId] = useState(null);
   const [userDbData, setUserDbData] = useState([]);
   const [userDataForEdit, setUserDataForEdit] = useState({});
+  const [searchQuery, setSearchQuery] = useState();
+  const [filteredData, setFilteredData] = useState(tableData);
 
   const headersData = useMemo(()=> ["User Name", "Role", "Status"], []);
+
+  useEffect(() => {
+    if (!searchQuery) {
+      setFilteredData(tableData);
+    } else {
+      const filtered = tableData.filter(item =>
+        item.data.some(value => 
+          value.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+      setFilteredData(filtered);
+    }
+  }, [searchQuery, tableData]);
 
   const fetchTableData = useCallback(async () => {
     try {
@@ -115,16 +131,8 @@ export default function Users() {
     <Fragment>
       <div className="overflow-x-auto shadow-md sm:rounded-lg">
         <div className="pb-4 flex justify-between items-center">
-          <label htmlFor="table-search" className="sr-only">
-            Search
-          </label>
-          <div className="mt-10 m-2">
-            <input
-              type="text"
-              id="table-search"
-              className="block p-3 ps-10 text-sm text-gray-900 border border-sky-500 rounded-lg w-50 sm:w-80 bg-gray-50 focus:ring-sky-500 focus:border-sky-500 dark:bg-cyan-950 dark:border-sky-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-sky-500 dark:focus:border-sky-500"
-              placeholder="Search for items"
-            />
+        <div className="mt-10">
+          <SearchComponent queryInput={(v) => setSearchQuery(v)}/>
           </div>
           <div className="left-0">
             <button
@@ -170,7 +178,7 @@ export default function Users() {
             <div className="overflow-x-auto shadow-md sm:rounded-lg">
             <Table
               headers={headers}
-              data={tableData}
+              data={filteredData}
               actionButtons={actionButtons}
             />
           </div>

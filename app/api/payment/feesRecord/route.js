@@ -54,7 +54,20 @@ export const POST = async (req, res) => {
     
     const feesRecord = new FeesRecordInfo(feesData);
     await feesRecord.save();
-    return NextResponse.json({ message: "Invoice created successfully" }, {status: 200})
+
+    await feesRecord
+    .populate({
+      path: 'student',
+      options: { strictPopulate: false }
+    })
+
+    await feesRecord
+    .populate({
+      path: 'grade',
+      options: { strictPopulate: false }
+    })
+
+    return NextResponse.json({ message: "Invoice created successfully", feesRecord }, {status: 200})
 
   } catch (err) {
     return NextResponse.json({error: err.message}, {status: 500})
