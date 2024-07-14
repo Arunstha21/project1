@@ -1,10 +1,15 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import FormFields from "@/app/component/FormFields";
 import formFields from "./formFields.json";
 import Validate from "@/app/component/Validation";
 
-export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAddOrEditMember }) {
+export default function AddMembers({
+  isVisible,
+  onClose,
+  memberDataForEdit,
+  onAddOrEditMember,
+}) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [formData, setFormData] = useState({});
@@ -15,17 +20,19 @@ export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAd
   useEffect(() => {
     const fetchStudentFields = async () => {
       try {
-        const response = await fetch('/api/members/grade', {
-          method: "GET"
+        const response = await fetch("/api/members/grade", {
+          method: "GET",
         });
         const gradesData = await response.json();
 
-        const updatedFields = studentFields.map(field => {
-          if (field.tag === 'grade') {
-            const options = gradesData.map(grade => ({
-              value: grade._id,
-              title: `Grade ${grade.grade}`
-            }));
+        const updatedFields = studentFields.map((field) => {
+          if (field.tag === "grade") {
+            const options = gradesData
+              .sort((a, b) => a.grade - b.grade)
+              .map((grade) => ({
+                value: grade._id,
+                title: `Grade ${grade.grade}`,
+              }));
             return { ...field, options };
           }
           return field;
@@ -33,31 +40,43 @@ export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAd
 
         setStudentFields(updatedFields);
       } catch (error) {
-        console.error('Error fetching grades:', error);
-        // Handle error fetching grades
+        console.error("Error fetching grades:", error);
       }
     };
 
     fetchStudentFields();
+  }, [studentFields]);
 
+  const initialFormData = useMemo(() => {
     const initialFormData = {};
     const type = memberDataForEdit?.studentInfo ? "Staff" : "Student";
-    const fieldsToIterate = [...generalFields, ...(type === "Student" ? updatedStudentFields : staffFields)];
+    const fieldsToIterate = [
+      ...generalFields,
+      ...(type === "Student" ? updatedStudentFields : staffFields),
+    ];
 
     for (const field of fieldsToIterate) {
       let value = "";
-      if (type === "Student" && memberDataForEdit?.studentInfo && field.tag in memberDataForEdit.studentInfo) {
+      if (
+        type === "Student" &&
+        memberDataForEdit?.studentInfo &&
+        field.tag in memberDataForEdit.studentInfo
+      ) {
         value = memberDataForEdit.studentInfo[field.tag];
-      } else if (type === "Staff" && memberDataForEdit?.staffInfo && field.tag in memberDataForEdit.staffInfo) {
+      } else if (
+        type === "Staff" &&
+        memberDataForEdit?.staffInfo &&
+        field.tag in memberDataForEdit.staffInfo
+      ) {
         value = memberDataForEdit.staffInfo[field.tag];
       } else if (memberDataForEdit && field.tag in memberDataForEdit) {
         value = memberDataForEdit[field.tag];
       }
       if (field.tag === "dateOfBirth" && memberDataForEdit?.dateOfBirth) {
         const dateOfBirth = new Date(memberDataForEdit.dateOfBirth);
-        value = dateOfBirth.toISOString().split('T')[0];
+        value = dateOfBirth.toISOString().split("T")[0];
       }
-      
+
       initialFormData[field.tag] = {
         value: value,
         title: field.title,
@@ -65,16 +84,19 @@ export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAd
     }
 
     if (memberDataForEdit) {
-      // Include the status field only in edit mode
       initialFormData.status = {
         value: memberDataForEdit.status || "",
         title: "Status",
       };
     }
 
+    return initialFormData;
+  }, [generalFields, memberDataForEdit, staffFields, updatedStudentFields]);
+
+  useEffect(() => {
     setFormData(initialFormData);
-    setMemberType(type);
-  }, [isVisible, memberDataForEdit, generalFields, studentFields, staffFields, updatedStudentFields]);
+    setMemberType(memberDataForEdit?.studentInfo ? "Staff" : "Student");
+  }, [initialFormData]);
 
   function handleFieldChange(tag, title, value = null) {
     setFormData((prevFormData) => ({
@@ -92,7 +114,12 @@ export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAd
     }));
   }
 
-  const typeSpecificFields = memberType === "Student" ? updatedStudentFields : memberType === "Staff" ? staffFields : [];
+  const typeSpecificFields =
+    memberType === "Student"
+      ? updatedStudentFields
+      : memberType === "Staff"
+      ? staffFields
+      : [];
   const combinedItems = [...generalFields, ...typeSpecificFields];
 
   async function submit(event) {
@@ -102,17 +129,26 @@ export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAd
     combinedItems.forEach((field) => {
       const tag = field.tag;
       const title = field.title;
-      updatedFormData[tag] = { value: formData[tag]?.value || "", title: title };
+      updatedFormData[tag] = {
+        value: formData[tag]?.value || "",
+        title: title,
+      };
     });
 
     if (memberDataForEdit) {
-      // Include the status field only in edit mode
-      updatedFormData.status = { value: formData.status?.value || "", title: "Status" };
+      updatedFormData.status = {
+        value: formData.status?.value || "",
+        title: "Status",
+      };
     }
 
     for (const field in updatedFormData) {
       const fieldValue = updatedFormData[field].value;
-      const validationError = Validate(field, updatedFormData[field].title, fieldValue);
+      const validationError = Validate(
+        field,
+        updatedFormData[field].title,
+        fieldValue
+      );
       if (validationError) {
         setError(validationError);
         return;
@@ -134,10 +170,13 @@ export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAd
           "Content-Type": "application/json",
         },
         body: JSON.stringify(
-          Object.keys(updatedFormData).reduce((acc, key) => {
-            acc[key] = updatedFormData[key].value;
-            return acc;
-          }, { type: memberType })
+          Object.keys(updatedFormData).reduce(
+            (acc, key) => {
+              acc[key] = updatedFormData[key].value;
+              return acc;
+            },
+            { type: memberType }
+          )
         ),
       });
 
@@ -166,7 +205,9 @@ export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAd
     <div
       onClick={handleClose}
       id="wrapper"
-      className={`fixed inset-0 min-h-full min-w-full bg-gray-100 dark:bg-sky-950 bg-opacity-5 backdrop-blur-sm dark:bg-opacity-5 dark:backdrop-blur-sm py-6 flex flex-col justify-center sm:py-12 ${!isVisible ? 'hidden' : ''}`}
+      className={`fixed inset-0 min-h-full min-w-full bg-gray-100 dark:bg-sky-950 bg-opacity-5 backdrop-blur-sm dark:bg-opacity-5 dark:backdrop-blur-sm py-6 flex flex-col justify-center sm:py-12 ${
+        !isVisible ? "hidden" : ""
+      }`}
     >
       <div className="relative py-3 sm:max-w-xl sm:mx-auto">
         <div className="relative px-4 py-10 bg-white dark:bg-cyan-950 shadow-lg sm:rounded-3xl sm:p-20">
@@ -179,7 +220,10 @@ export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAd
             <div className="divide-y divide-gray-200">
               <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
                 <div className="relative">
-                  <label htmlFor="type" className="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                  <label
+                    htmlFor="type"
+                    className="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-300"
+                  >
                     Select Type
                   </label>
                   <select
@@ -204,7 +248,9 @@ export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAd
                     options={field.options}
                     required={field.required}
                     value={formData[field.tag] ? formData[field.tag].value : ""}
-                    onChangeValue={(e) => handleFieldChange(field.tag, field.title, e.target.value)}
+                    onChangeValue={(e) =>
+                      handleFieldChange(field.tag, field.title, e.target.value)
+                    }
                   />
                 ))}
                 {memberDataForEdit && (
@@ -216,7 +262,9 @@ export default function AddMembers({ isVisible, onClose, memberDataForEdit, onAd
                     type="text"
                     required={false}
                     value={formData.status ? formData.status.value : ""}
-                    onChangeValue={(e) => handleFieldChange("status", "Status", e.target.value)}
+                    onChangeValue={(e) =>
+                      handleFieldChange("status", "Status", e.target.value)
+                    }
                   />
                 )}
                 <div className="relative">

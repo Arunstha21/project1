@@ -26,7 +26,16 @@ export default function AttendanceStudent({studentId}) {
       setCurrentDate(date);
       setSelectedMonth(`${getMonthName(date.getMonth())} ${date.getFullYear()}`);
       const numberOfDays = daysInMonth(date.getFullYear(), date.getMonth());
-      setTotalDays(numberOfDays)
+      let nonSaturdayDays = 0;
+
+  for (let day = 1; day <= numberOfDays; day++) {
+    const currentDate = new Date(date.getFullYear(), date.getMonth(), day);
+    if (currentDate.getDay() !== 6) { // getDay() returns 6 for Saturday
+      nonSaturdayDays++;
+    }
+  }
+
+  setTotalDays(nonSaturdayDays);
     };
 
     useEffect(() => {

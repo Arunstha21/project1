@@ -14,7 +14,7 @@ export default function Validate(id, title, value=""){
             return (`Invalid ${title}`);
         }
     } else if (id === "contactNo" && title === "Contact No.") {
-        const contactNoRegex = /^\d{10}$/;
+        const contactNoRegex = /^(98|97)\d{8}$/;
         if (!contactNoRegex.test(value)) {
             return (`Invalid ${title}`);
         }

@@ -75,7 +75,7 @@ export default function AdminAttendance() {
       <div className="overflow-x-auto shadow-md sm:rounded-lg">
       <div className=" border rounded-lg shadow-md items-center">
         <div className="flex justify-between iteams-center">
-        <div className="mt-10">
+        <div className="flex mt-7 m-2">
           <SearchComponent queryInput={(v) => setSearchQuery(v)}/>
           </div>
           <div className="flex gap-2 mt-10 m-2">
