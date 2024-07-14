@@ -88,7 +88,6 @@ export default function CsvUpload({ fetchTableData }) {
           <div className="dark:bg-cyan-700 p-8 bg-white rounded-lg shadow-lg w-96">
             <label
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              for="file_input"
             >
               Upload file
             </label>

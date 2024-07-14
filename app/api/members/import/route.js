@@ -13,6 +13,11 @@ export const POST = async (req) => {
         continue;
       }
 
+      const existingMember = await MemberInfo.findOne({ email: membersData.email });
+      if (existingMember) {
+        continue;
+      }
+
       const [firstName, ...lastNameParts] = membersData.fullName.split(' ');
       const lastName = lastNameParts.join(' ');
       let userName = `${membersData.fullName.replace(/\s+/g, '.').toLowerCase()}`;
@@ -38,7 +43,6 @@ export const POST = async (req) => {
       }
 
       const grade = await GradeInfo.find({grade: Number(membersData.grade)})
-      console.log(grade);
 
       const student = new StudentInfo({
         studentId: membersData.studentId,

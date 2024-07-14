@@ -37,18 +37,15 @@ export default function StudentPaymentPage() {
             const paymentData = await payment.json();
             
             const memberPayments = paymentData.filter((payment) => payment.student._id === profileData.memberId);
-              let studentTotalPending = 0;
-              let studentTotalPaidAmount = 0;
               const studentData = [];
             
               memberPayments.forEach((payment, index) => {
                 let paidAmount = 0;
                 let status = 'Pending'
-                if (payment.esewaPayment) {
-                  paidAmount = payment.esewaPayments.reduce((total, payment) => total + payment.amount, 0);
-                  studentTotalPaidAmount += payment.esewaPayment.amount;
-                } else {
-                  studentTotalPending += payment.amount;
+                if (payment.esewaPayments && payment.esewaPayments.length > 0) {
+                  payment.esewaPayments.forEach((esewaPayment) => {
+                    paidAmount += esewaPayment.amount;
+                  });
                 }
 
                 status = (payment.amount == paidAmount) ? "Paid" : (paidAmount > 0 && payment.amount > paidAmount) ? "Partial Paid" : status;
@@ -66,6 +63,7 @@ export default function StudentPaymentPage() {
                   ]
                 });
               });
+              console.log(studentData);
 
               setAllStudents(memberPayments);
               setStudents(studentData);
