@@ -59,26 +59,27 @@ export default function Calendar ({attendanceData, selectedMonth, updateDateAndM
         if (week === 0 && weekDay < firstDayOfMonth) {
           // Previous month days
           weekDays.push(
-            <div key={`empty-${weekDay}`} className="flex h-12 items-center justify-center mt-2 rounded-md text-sm font-medium bg-neutral-950 bg-opacity-25">
+            <div key={`empty-${weekDay}`} className="flex h-12 items-center justify-center mt-2 rounded-md text-sm font-medium bg-gray-300 text-gray-400 bg-opacity-25 dark:bg-neutral-950 dark:bg-opacity-25">
               {prevMonthDays[weekDay]}
             </div>
           );
         } else if (day > daysInMonth) {
           // Next month days
           weekDays.push(
-            <div key={`empty-${weekDay}`} className="flex h-12 items-center justify-center mt-2 rounded-md text-sm font-medium bg-neutral-950 bg-opacity-25">
+            <div key={`empty-${weekDay}`} className="flex h-12 items-center justify-center mt-2 rounded-md text-sm font-medium bg-gray-300 text-gray-400 bg-opacity-25 dark:bg-neutral-950 dark:bg-opacity-25">
               {nextMonthDays.shift()}
             </div>
           );
         } else {
-          // Current month days
           const isPresent = attendanceDays?.includes(day) || false;
-        const isSaturday = new Date(year, month, day).getDay() === 6; // Saturday is index 6 (0-indexed)
+        const isSaturday = new Date(year, month, day).getDay() === 6;
+        const today = new Date();
+        const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
         weekDays.push(
           <div
             key={day}
             className={`flex h-12 items-center justify-center mt-2 rounded-md text-sm font-medium ${
-              isPresent ? 'bg-green-500 text-white' : isSaturday ? 'bg-red-500 text-white' : 'bg-gray-600 bg-opacity-25 text-green-50'
+              isPresent ? 'bg-green-500 text-white' : isSaturday ? 'bg-red-500 text-white' : isToday ? 'bg-gray-950 text-white' : 'text-gray-950 bg-gray-200 dark:bg-gray-600 dark:bg-opacity-25 text-green-50'
             }`}
           >
             {day}

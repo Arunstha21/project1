@@ -55,7 +55,7 @@ export default function Header () {
   }
 
  return (
-    <div onClick={handelClose} id="wrapper" className="border-2 border-sky-500 rounded-lg mr-2 p-4 shadow-sm bg-white flex justify-between text-gray-900 dark:bg-cyan-950 dark:text-gray-300">
+    <div onClick={handelClose} id="wrapper" className="min-w-full border-2 border-sky-500 rounded-lg mr-2 p-4 shadow-sm bg-white flex justify-between text-gray-900 dark:bg-cyan-950 dark:text-gray-300">
       <div>
 
       </div>
@@ -65,9 +65,9 @@ export default function Header () {
         </button>
     </div>
     {isOpen && (
-        <div className="absolute right-0 mt-10 mr-2 w-48 origin-top-right border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg outline-none">
+        <div className="absolute right-0 mt-10 mr-2 w-48 origin-top-right border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg outline-none bg-white">
             <button
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-cyan-950 dark:bg-sky-500 dark:text-white rounded-md"
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-cyan-950 dark:bg-sky-500 dark:text-white rounded-md"
               onClick={handleLogout}
             >
               Logout

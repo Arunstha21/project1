@@ -46,13 +46,6 @@
             "required": true
         },
         {
-            "field": "input",
-            "tag": "photo",
-            "title": "Photo",
-            "type": "file",
-            "required": false
-        },
-        {
             "field": "select",
             "tag": "bloodGroup",
             "title": "Blood Group",
@@ -170,7 +163,6 @@
     ],
     "userValidation" :{
         "userName": true,
-        "password": true,
         "role": true
     },
     "invoiceFields": [

@@ -173,7 +173,8 @@ export default function Users() {
             </div>
           </div>
         )}
-        <Card className='xl:w-5/12'>
+        <div className="xl:flex justify-center">
+        <Card className='xl:w-6/12'>
           <CardContent className="p-5">
             <div className="overflow-x-auto shadow-md sm:rounded-lg">
             <Table
@@ -184,6 +185,8 @@ export default function Users() {
           </div>
           </CardContent>
         </Card>
+        </div>
+
 
         {error && <Alert type="error" message={error} />}
         {isEditAddUserPopupOpen && (

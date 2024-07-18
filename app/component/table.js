@@ -112,11 +112,12 @@ export default function Table({ headers, data, actionButtons, payment, fetchPaym
                       )
                     )}
                     {editingRowIndex !== row.id && (
-                      typeof item.value === "boolean" ? (
+                      typeof item?.value === "boolean" ? (
                         <input
                           type="checkbox"
                           onChange={item.onchange}
                           checked={item.value}
+                          disabled={item.disabled}
                           className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded hover:ring-blue-500 dark:hover:ring-blue-600 dark:ring-offset-gray-800 hover:ring-2 dark:bg-gray-700 dark:border-gray-600"
                         />
                       ) : (

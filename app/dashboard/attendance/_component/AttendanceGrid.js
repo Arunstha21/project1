@@ -1,31 +1,42 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Table from "@/app/component/table";
 
-export default function AttendanceGrid({ attendanceList, selectedMonth, updateChecked, searchQuery }) {
+export default function AttendanceGrid({role, attendanceList, selectedMonth, updateChecked, searchQuery }) {
   const [error, setError] = useState("");
   const [rowData, setRowData] = useState([]);
-  const [headers, setHeaders] = useState(["Number", "Student Name"]);
-  const daysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
-  const [year, month] = selectedMonth.split("-").map(Number);
-  const numberOfDays = daysInMonth(year, month - 1);
-  const daysArray = Array.from({ length: numberOfDays }, (_, i) => i + 1);
-  const addHeaders = daysArray.map((date) => date.toString());
   const [filteredRowData, setFilteredRowData] = useState(rowData);
+  const [daysArray, setDaysArray] = useState();
+  const [headers, setHeaders] = useState(["Number", "Student Name"]);
 
-  useEffect(()=>{
-    setHeaders([...headers, ...addHeaders]);
-  },[selectedMonth])
+  const daysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+
+  useEffect(() => {
+    const [year, month] = selectedMonth.split("-").map(Number);
+    const numberOfDays = daysInMonth(year, month - 1);
+    const daysArray = Array.from({ length: numberOfDays }, (_, i) => i + 1);
+    const addHeaders = daysArray.map((date) => date.toString());
+    setDaysArray(daysArray);
+    setHeaders(["Number", "Student Name", ...addHeaders]);
+  }, [selectedMonth]);
 
   useEffect(() => {
     const userList = getUniqueRecords();
     const tableData = userList.map((user, index) => {
-      const userAttendance = daysArray.reduce((acc, date) => {
-        const attendanceEntry = attendanceList.find((entry) => entry.studentId === user.studentId && entry.day === date);
+      const userAttendance = daysArray.reduce((acc, day) => {
+        const fullDateStr = `${selectedMonth}-${String(day).padStart(2, '0')}`;
+        const attendanceEntry = attendanceList.find((entry) => entry.studentId === user.studentId && entry.day === day);
         const attendanceId = attendanceEntry ? attendanceEntry.attendanceId : null;
-
-        acc[date] = {
-          value: isPresent(user.studentId, date),
-          onchange: (e) => handleCheckboxChange(user.studentId, date, e.target.checked, attendanceId),
+      
+        const currentDate = new Date();
+        const attendanceDate = new Date(fullDateStr);
+      
+        const diffInDays = (currentDate - attendanceDate) / (1000 * 60 * 60 * 24);
+        const isOlderThanOneDay = diffInDays > 2;
+      
+        acc[fullDateStr] = {
+          value: isPresent(user.studentId, day),
+          onchange: (e) => handleCheckboxChange(user.studentId, day, e.target.checked, attendanceId),
+          disabled: role==='staff' ? isOlderThanOneDay : false
         };
         return acc;
       }, {});

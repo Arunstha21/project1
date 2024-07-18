@@ -5,6 +5,7 @@ import AdminAttendance from "./_component/admin";
 
 export default function Payment(){
     const [componentShow, setComponentShow] = useState();
+
     useEffect(() => {
         const fetchProfile = async () => {
             try {
@@ -19,7 +20,7 @@ export default function Payment(){
                     setComponentShow(profileData?.role === "student" ? (
                         <AttendanceStudent studentId={profileData.memberId}/>
                     ) : (
-                        <AdminAttendance />
+                        <AdminAttendance role={profileData.role} />
                     ))
                 } else {
                     console.error('Failed to fetch profile');

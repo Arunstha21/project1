@@ -5,7 +5,7 @@ const { LoginInfo } = require('@/lib/modals/user');
 export const GET = async (req, res) => {
     try {
         await connect();
-        const users = await LoginInfo.find();
+        const users = await LoginInfo.find({}, '-password');
     
         return NextResponse.json(users, {status: 200})
       } catch (err) {

@@ -9,10 +9,11 @@ export const GET = async (req, res) => {
         const userId = context.params.id;
         const users = await LoginInfo.findById(userId);
         if (!users) {
-            return NextResponse.json({ error: "User not found" }, {status: 404})
-          }
-    
-        return NextResponse.json(users, {status: 200})
+          return NextResponse.json({ error: "User not found" }, {status: 404})
+        }
+        const {password, ...usersWP} = users;
+        
+        return NextResponse.json(usersWP, {status: 200})
       } catch (err) {
         return NextResponse.json({error: err.message}, {status: 500})
       }
@@ -28,8 +29,10 @@ export const PUT = async (req, context) => {
         if (!user) {
           return NextResponse.json({ error: "user not found" }, {status: 404})
         }
-        const hashedPassword = await bcryptjs.hash(usersData.password, 4);
-    
+        let hashedPassword;
+        if (usersData.password) {
+          hashedPassword = await bcryptjs.hash(usersData.password, 4);
+        }
         user.userName = usersData.userName || user.userName;
         user.password = hashedPassword || user.password;
         user.role = usersData.role || user.role;

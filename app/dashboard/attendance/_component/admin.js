@@ -3,8 +3,7 @@ import { Fragment, useEffect, useState } from "react";
 import AttendanceGrid from "../_component/AttendanceGrid";
 import SearchComponent from "@/app/component/Search";
 
-export default function AdminAttendance() {
-
+export default function AdminAttendance({role}) {
   const [error, setError] = useState("");
   const [gradeOptions, setGradeOptions] = useState();
   const [selectedMonth, setSelectedMonth] = useState("");
@@ -113,7 +112,7 @@ export default function AdminAttendance() {
         </div>
 
         <div className="mt-5 flex items-center">
-          <AttendanceGrid attendanceList={attendanceList} updateChecked={search} selectedMonth={selectedMonth} searchQuery={searchQuery}/>
+          <AttendanceGrid attendanceList={attendanceList} updateChecked={search} selectedMonth={selectedMonth} searchQuery={searchQuery} role={role}/>
         </div>
       </div>
     </Fragment>

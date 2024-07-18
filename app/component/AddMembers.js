@@ -213,12 +213,13 @@ export default function AddMembers({
         <div className="relative px-4 py-10 bg-white dark:bg-cyan-950 shadow-lg sm:rounded-3xl sm:p-20">
           <div className="max-w-md mx-auto">
             <div>
-              <h1 className="text-2xl text-black dark:text-white font-semibold">
+              <h1 className="flex justify-center text-2xl text-black dark:text-white font-semibold">
                 {memberDataForEdit ? "Edit Member" : "Add Member"}
               </h1>
             </div>
             <div className="divide-y divide-gray-200">
-              <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
+              <div>
+              <div className="sm:grid grid-cols-2 gap-3 py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
                 <div className="relative">
                   <label
                     htmlFor="type"
@@ -267,7 +268,8 @@ export default function AddMembers({
                     }
                   />
                 )}
-                <div className="relative">
+              </div>
+              <div className="flex justify-center">
                   <button
                     id="submit"
                     onClick={submit}
@@ -285,7 +287,7 @@ export default function AddMembers({
                 </div>
                 {error && <p className="text-red-500">{error}</p>}
                 {success && <p className="text-green-500">{success}</p>}
-              </div>
+                </div>
             </div>
           </div>
         </div>

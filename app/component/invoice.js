@@ -52,10 +52,11 @@ export default function Invoice ({ invoiceData }) {
         <div className="grid grid-cols-2 gap-2">
           <div className="font-medium">Subtotal:</div>
           <div>{invoiceData.total}</div>
-          <div className="font-medium">Tax (8%):</div>
-          <div>{((invoiceData.total*8)/100).toFixed(2)}</div>
+          {/* <div className="font-medium">Tax (8%):</div>
+          <div>{((invoiceData.total*8)/100).toFixed(2)}</div> */}
           <div className="font-bold text-2xl">Grand Total:</div>
-          <div className="font-bold text-2xl">{(((invoiceData.total*8)/100)+invoiceData.total).toFixed(2)}</div>
+          <div className="font-bold text-2xl">{invoiceData.total}</div>
+          {/* <div className="font-bold text-2xl">{(((invoiceData.total*8)/100)+invoiceData.total).toFixed(2)}</div> */}
         </div>
       </div>
       <div className="mt-8">
@@ -68,7 +69,7 @@ export default function Invoice ({ invoiceData }) {
           </div>
       </div>
     </div>
-    <button onClick={handlePrint}>Print</button>
+    <button onClick={handlePrint} className="bg-cyan-500 right-0 hover:bg-cyan-400 dark:hover:bg-cyan-600 text-white dark:bg-cyan-700 rounded-md px-4 mt-8 mr-8 py-2" >Print</button>
           </div>
   );
 };

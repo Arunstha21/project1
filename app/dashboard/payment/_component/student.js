@@ -82,7 +82,7 @@ export default function StudentPaymentPage() {
   const actionButtons = [
     {
       label: "Make Payment",
-      extraClass: "hover:bg-cyan-400 dark:hover:bg-cyan-600 text-white dark:bg-cyan-700 rounded-md px-4 mr-8 py-2",
+      extraClass: "hover:bg-cyan-400 bg-cyan-500 dark:hover:bg-cyan-600 text-white dark:bg-cyan-700 rounded-md px-4 mr-8 py-2",
       color: "blue"
     }
   ];

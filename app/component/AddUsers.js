@@ -10,6 +10,9 @@ function Validate(id, title, value = "") {
       return `Invalid ${title}, characters should be lowercase letters and underscores, with a length between 4 to 10.`;
     }
   } else if (id === "password") {
+    if (!value) {
+      return
+    }
     const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[!@#$])[a-zA-Z0-9!@#$]{8,}$/;
     if (!passwordRegex.test(value)) {
       return `Invalid ${title}, password must be at least 8 characters long and contain at least one lowercase letter.`;
