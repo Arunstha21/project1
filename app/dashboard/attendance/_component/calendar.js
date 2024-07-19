@@ -59,14 +59,14 @@ export default function Calendar ({attendanceData, selectedMonth, updateDateAndM
         if (week === 0 && weekDay < firstDayOfMonth) {
           // Previous month days
           weekDays.push(
-            <div key={`empty-${weekDay}`} className="flex h-12 items-center justify-center mt-2 rounded-md text-sm font-medium bg-gray-300 text-gray-400 bg-opacity-25 dark:bg-neutral-950 dark:bg-opacity-25">
+            <div key={`empty-${weekDay}`} className="flex h-12 items-center justify-center mt-2 rounded-md text-sm font-medium bg-gray-300 text-gray-400 bg-opacity-25 dark:bg-neutral-950 dark:bg-opacity-15">
               {prevMonthDays[weekDay]}
             </div>
           );
         } else if (day > daysInMonth) {
           // Next month days
           weekDays.push(
-            <div key={`empty-${weekDay}`} className="flex h-12 items-center justify-center mt-2 rounded-md text-sm font-medium bg-gray-300 text-gray-400 bg-opacity-25 dark:bg-neutral-950 dark:bg-opacity-25">
+            <div key={`empty-${weekDay}`} className="flex h-12 items-center justify-center mt-2 rounded-md text-sm font-medium bg-gray-300 text-gray-400 bg-opacity-25 dark:bg-neutral-950 dark:bg-opacity-15">
               {nextMonthDays.shift()}
             </div>
           );
@@ -79,7 +79,7 @@ export default function Calendar ({attendanceData, selectedMonth, updateDateAndM
           <div
             key={day}
             className={`flex h-12 items-center justify-center mt-2 rounded-md text-sm font-medium ${
-              isPresent ? 'bg-green-500 text-white' : isSaturday ? 'bg-red-500 text-white' : isToday ? 'bg-gray-950 text-white' : 'text-gray-950 bg-gray-200 dark:bg-gray-600 dark:bg-opacity-25 text-green-50'
+              isPresent ? 'bg-green-500 text-white' : isSaturday ? 'bg-red-500 text-white' : isToday ? 'bg-gray-950 text-white' : 'text-gray-950 bg-gray-200 dark:bg-gray-600 dark:text-white dark:bg-opacity-25 text-green-50'
             }`}
           >
             {day}
